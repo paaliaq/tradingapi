@@ -1,0 +1,43 @@
+image: python:3.8
+
+stages:
+  - lint
+  - test
+
+include:
+  - template: Code-Quality.gitlab-ci.yml
+
+application-lint-black:
+  stage: lint
+  script:
+    - pip install black
+    - black --check src/
+
+application-lint-flake8:
+  stage: lint
+  script:
+    - pip install flake8 pep8-naming
+    - flake8 src/
+
+application-lint-mypy:
+  stage: lint
+  script:
+    - pip install mypy
+    - mypy src/
+
+application-lint-pydocstyle:
+  stage: lint
+  script:
+    - pip install pydocstyle
+    - pydocstyle src/
+
+application-lint-darglint:
+  stage: lint
+  script:
+    - pip install darglint
+    - darglint src/
+
+code_quality:
+  stage: lint
+  artifacts:
+    paths: [gl-code-quality-report.json]
