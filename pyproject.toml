@@ -12,6 +12,7 @@ scipy = "1.5.4"
 pymongo = "3.11.2"
 requests = "2.25.1"
 pytz = "2020.5"
+hjson = "3.0.2"
 alpaca-trade-api = "v0.51.0"
 
 [tool.poetry.dev-dependencies]
