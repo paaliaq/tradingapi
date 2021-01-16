@@ -23,7 +23,7 @@ pep8-naming = "^0.11.1"
 mypy = "^0.790"
 pydocstyle = "^5.1.1"
 darglint = "^1.5.8"
-
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["poetry>=0.12"]
