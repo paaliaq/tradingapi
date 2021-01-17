@@ -90,3 +90,9 @@ target/
 
 # Poetry
 poetry.lock
+
+# Ignore config files
+.config/*
+
+# Noteboooks
+*/gitignored_notebooks/*
