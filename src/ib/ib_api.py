@@ -1,6 +1,7 @@
 """Base class for trading APIs."""
 from typing import Dict, List
 
+import requests
 from src.base.base_api import BaseApi
 
 
@@ -17,8 +18,12 @@ class AlpacaApi(BaseApi):
     def __init__(self, key_id: str, secret_key: str, base_url: str):
         """Class initialization function."""
 
-    def get_account(self) -> Dict:
-        """Get the account."""
+    def get_accounts(self) -> Dict:
+        """Get the accounts."""
+        return None
+
+    def get_portfolio(self) -> Dict:
+        """Get the accounts."""
         return None
 
     def submit_order(self) -> Dict:
@@ -61,3 +66,8 @@ class AlpacaApi(BaseApi):
     def close_all_positions(self) -> List[Dict]:
         """Liquidates all open positions at market price."""
         return None
+
+    def extend_session(self) -> str:
+        """Extends interactive session."""
+        response = requests.post("https://localhost:5000/v1/api/tickle", verify=False)
+        return response.status_code
