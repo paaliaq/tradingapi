@@ -19,11 +19,13 @@ class AlpacaApi(BaseApi):
         """Class initialization function."""
 
     def get_accounts(self) -> Dict:
-        """Get the accounts."""
-        return None
+        """Get the accounts associated with login."""
+        response = requests.get("https://localhost:5000/v1/api/portfolio/accounts",
+                            verify=False)
+        return response.json()[0]
 
-    def get_portfolio(self) -> Dict:
-        """Get the accounts."""
+    def get_portfolio(self, account_id, page = 0) -> Dict:
+        """Get ."""
         return None
 
     def submit_order(self) -> Dict:
@@ -33,20 +35,30 @@ class AlpacaApi(BaseApi):
         """
         return None
 
-    def list_orders(self) -> List[Dict]:
+    def list_orders(self) -> Dict:
         """List orders.
-
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """
-        return None
+        response = requests.get("https://localhost:5000/v1/api/iserver/account/orders",
+                              verify=False)
+        orders = response.json()["orders"]
+
+        return orders
 
     def get_order(self, order_id: str) -> Dict:
         """Get an order with specific order_id."""
         return None
 
-    def cancel_order(self, order_id: str) -> None:
+    def cancel_order(self, order_id: str, account_id: str) -> Dict:
         """Cancel an order with specific order_id."""
+        #  Must call /iserver/accounts endpoint prior to cancelling an order.
+        accounts = requests.get("https://localhost:5000/v1/api/iserver/accounts",
+                              verify=False)
+        response = requests.delete("https://localhost:5000/v1/api/iserver/account/" +
+                                   account_id + "/order/" + order_id, verify=False)
+        response_content = response.json()
+        return response_content
 
     def cancel_all_orders(self) -> None:
         """Cancel all orders."""
@@ -70,4 +82,9 @@ class AlpacaApi(BaseApi):
     def extend_session(self) -> str:
         """Extends interactive session."""
         response = requests.post("https://localhost:5000/v1/api/tickle", verify=False)
+        return response.status_code
+
+    def end_session(self) -> str:
+        """Extends interactive session."""
+        response = requests.post("https://localhost:5000/v1/api/logout", verify=False)
         return response.status_code
