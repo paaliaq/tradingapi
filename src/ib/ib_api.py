@@ -185,7 +185,7 @@ class AlpacaApi(BaseApi):
     def cancel_order(self, order_id: str, account_id: str) -> Dict:
         """Cancel an order with specific order_id."""
         #  Must call /iserver/accounts endpoint prior to cancelling an order.
-        accounts = requests.get("https://localhost:5000/v1/api/iserver/accounts",
+        requests.get("https://localhost:5000/v1/api/iserver/accounts",
                               verify=False)
         response = requests.delete("https://localhost:5000/v1/api/iserver/account/" +
                                    account_id + "/order/" + order_id, verify=False)
@@ -195,9 +195,14 @@ class AlpacaApi(BaseApi):
     def cancel_all_orders(self) -> None:
         """Cancel all orders."""
 
-    def list_positions(self) -> List[Dict]:
+    def list_positions(self, account_id: str, page_id: str = "0") -> Dict:
         """Get a list of open positions."""
-        return None
+        positions_response = requests.get("https://localhost:5000/v1/api/portfolio/" +
+                                          account_id + "/positions/" + page_id,
+                                          verify=False)
+        positions_json = positions_response.json()
+
+        return positions_json
 
     def get_position(self, symbol: str) -> Dict:
         """Get an open position for a symbol."""
