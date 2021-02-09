@@ -18,13 +18,13 @@ class IbApi(BaseApi):
     def __init__(self):
         """Class initialization function."""
         ib = IB()
-        ib.connect('127.0.0.1', 4002, clientId=13)
+        ib.connect('127.0.0.1', 4002, clientId=13) # Todo change?
 
-    def get_account(self) -> Dict:
+    def get_account(self) -> List:
         """Get the accounts associated with login."""
-        response = requests.get("https://localhost:5000/v1/api/portfolio/accounts",
-                            verify=False)
-        return response.json()[0]
+        accounts = ib.client.getAccounts()
+
+        return accounts
 
     def submit_order(self,
                      symbol: str = None,
