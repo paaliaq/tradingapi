@@ -1,11 +1,11 @@
 """Base class for trading APIs."""
 from typing import Dict, List
+from ib_insync import *
 
-import requests
 from src.base.base_api import BaseApi
 
 
-class AlpacaApi(BaseApi):
+class IbApi(BaseApi):
     """Class for Alpaca API.
 
     This class is using the interactive broker api.
@@ -15,32 +15,30 @@ class AlpacaApi(BaseApi):
     https://www.interactivebrokers.com/en/trading/ib-api.php
     """
 
-    def __init__(self, key_id: str, secret_key: str, base_url: str):
+    def __init__(self):
         """Class initialization function."""
+        ib = IB()
+        ib.connect('127.0.0.1', 4002, clientId=13)
 
-    def get_accounts(self) -> Dict:
+    def get_account(self) -> Dict:
         """Get the accounts associated with login."""
         response = requests.get("https://localhost:5000/v1/api/portfolio/accounts",
                             verify=False)
         return response.json()[0]
 
-    def get_portfolio(self, account_id, page = 0) -> Dict:
-        """Get ."""
-        return None
-
     def submit_order(self,
-                     account_id: str = None,
+                     account_id: str,
                      con_id: str,
-                     sector_type: str,
-                     customer_order_id: str,
-                     parent_order_id: str,
-                     order_type: str = "MKT",
-                     extended_hours: bool,
-                     price: float = None,
+                     qty: float,
                      side: str,
+                     customer_order_id: str = "test",
+                     parent_order_id: str = None,
+                     sector_type: str = "STK",
+                     extended_hours: bool = False,
+                     order_type: str = "MKT",
+                     price: float = None,
                      symbol: str = None,
-                     time_in_force: str,
-                     qty: float) -> List[Dict, Dict]:
+                     time_in_force: str = "DAY") -> List[Dict]:
         """Submit an order.
 
         Args:
@@ -195,14 +193,11 @@ class AlpacaApi(BaseApi):
     def cancel_all_orders(self) -> None:
         """Cancel all orders."""
 
-    def list_positions(self, account_id: str, page_id: str = "0") -> Dict:
+    def list_positions(self) -> Position:
         """Get a list of open positions."""
-        positions_response = requests.get("https://localhost:5000/v1/api/portfolio/" +
-                                          account_id + "/positions/" + page_id,
-                                          verify=False)
-        positions_json = positions_response.json()
+        positions = ib.positions()
 
-        return positions_json
+        return positions
 
     def get_position(self, symbol: str) -> Dict:
         """Get an open position for a symbol."""
@@ -210,10 +205,14 @@ class AlpacaApi(BaseApi):
 
     def close_position(self, symbol: str) -> Dict:
         """Liquidates the position for the given symbol at market price."""
+        self.list_positions() # Extract specific one
+        self.submit_order()
         return None
 
     def close_all_positions(self) -> List[Dict]:
         """Liquidates all open positions at market price."""
+        self.list_positions() # Extract specific one
+
         return None
 
     def extend_session(self) -> str:
@@ -221,7 +220,6 @@ class AlpacaApi(BaseApi):
         response = requests.post("https://localhost:5000/v1/api/tickle", verify=False)
         return response.status_code
 
-    def end_session(self) -> str:
+    def end_session(self):
         """Extends interactive session."""
-        response = requests.post("https://localhost:5000/v1/api/logout", verify=False)
-        return response.status_code
+        ib.disconnect()
