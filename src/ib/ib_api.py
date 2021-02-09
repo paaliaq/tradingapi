@@ -27,143 +27,66 @@ class IbApi(BaseApi):
         return response.json()[0]
 
     def submit_order(self,
-                     account_id: str,
-                     con_id: str,
-                     qty: float,
-                     side: str,
-                     customer_order_id: str = "test",
-                     parent_order_id: str = None,
-                     sector_type: str = "STK",
-                     extended_hours: bool = False,
-                     order_type: str = "MKT",
-                     price: float = None,
                      symbol: str = None,
-                     time_in_force: str = "DAY") -> List[Dict]:
+                     currency: str = None,
+                     qty: float = None,
+                     side: str = None,
+                     order_type: str = "MKT",
+                     limit_price: float = None,
+                     stop_price: float = None) -> List[Dict]:
         """Submit an order.
 
-        Args:
-            account_id: str = None, Optional.
-            It should be one of the accounts returned by /iserver/accounts.
-            If not passed, the first one in the list is selected.
+                Args:
+                    symbol: str = None, Selected asset for trade
 
-            con_id: str, is the identifier of the security you want to trade,
-            you can find the conid with /iserver/secdef/search.
+                    currency str = None, The underlying’s currency.
 
-            sector_type: str, conid:type for example 265598:STK
+                    qty: float, quantity traded.
 
-            customer_order_id: str, Arbitraty string that can be used to identify the order,
-            e.g "my-fb-order"
+                    side: str, "SELL" or "BUY", direction.
 
-            parent_order_id: str, When placing bracket orders,
-            the child parentId must be equal to the cOId (customer order id) of the parent.
+                    order_type: str = "MKT", Can be one of "MKT" (Market), "LMT" (Limit),
+                    "STP" (Stop) or "STP_LIMIT" (stop limit)
 
-            order_type: str = "MKT", Can be one of "MKT" (Market), "LMT" (Limit),
-            "STP" (Stop) or "STP_LIMIT" (stop limit)
+                    extended_hours: bool, If true, order will be eligible to execute
+                    in premarket/afterhours.
 
-            extended_hours: bool, If true, order will be eligible to execute
-            in premarket/afterhours.
+                     limit_price: float = None,
 
-            price: float = None, Optional if order is "MKT",
-            for "LMT", this is the limit price. For "STP" this is the stop price.
+                     stop_price: float = None,
 
-            side: str, "SELL" or "BUY"
+                Returns:
+                    List[Dict, Trade]: A list containing dictionary of trade and Trade object
+                """
 
-            symbol: str = None, Called  ticker in api doc.
-
-            time_in_force: str, "GTC" (Good Till Cancel) or "DAY".
-            DAY orders are automatically cancelled at the end of the Day or Trading hours.
-
-            qty: float, quantity bought
-
-        Returns:
-            List[Dict,Dict]: A list of dictionary containing order information and
-            dictionary of response
-        """
-
-        order_body = {
-            # acctId is optional.
-            # It should be one of the accounts returned by /iserver/accounts.
-            # If not passed, the first one in the list is selected.
-            "acctId": account_id,
-
-            # conid is the identifier of the security you want to trade,
-            # you can find the conid with /iserver/secdef/search.
-            "conid": con_id,
-
-            # conid:type for example 265598:STK
-            "secType": sector_type,
-
-            # Customer Order ID.
-            # An arbitraty string that can be used to identify the order,
-            # e.g "my-fb-order". The value must be unique for a 24h span.
-            # Please do not set this value for child orders when placing a
-            # bracket order.
-            "cOID": customer_order_id,
-
-            # When placing bracket orders,
-            # the child parentId must be equal to the cOId (customer order id)
-            # of the parent.
-            "parentId": parent_order_id,
-
-            # orderType can be one of MKT (Market), LMT (Limit),
-            # STP (Stop) or STP_LIMIT (stop limit)
-            "orderType": order_type,
-
-            # listingExchange is optional. By default we use "SMART" routing.
-            # Possible values are available via this end point:
-            # /v1/portal/iserver/contract/{{conid}}/info,
-            # see valid_exchange: e.g:
-            # SMART,AMEX,NYSE, CBOE,ISE,CHX,ARCA,ISLAND,DRCTEDGE,BEX,BATS,EDGEA,
-            # CSFBALGO,JE FFALGO,BYX,IEX,FOXRIVER,TPLUS1,NYSENAT,PSX
-            "listingExchange": "SMART",
-
-            # set to true if the order can be executed outside regular trading hours.
-            "outsideRTH": extended_hours,
-
-            # optional if order is MKT, for LMT, this is the limit price.
-            # For STP this is the stop price.
-            "price": price,
-
-            # SELL or BUY
-            "side": side,
-
-            "ticker": symbol,
-
-            # GTC (Good Till Cancel) or DAY.
-            # DAY orders are automatically cancelled at the end of the Day or
-            # Trading hours.
-            "tif": time_in_force,
-
-            # for example QuickTrade
-            "referrer": "QuickTrade",
-
-            # usually integer, for some special cases can be float numbers
-            "quantity": qty,
-
-            # double number,
-            # this is the cash quantity field which can only be used for
-            # FX conversion order.
-            "fxQty": 0,
-
-            # If true, the system will use the Adaptive Algo to submit the order
-            # https://www.interactivebrokers.com/en/index.php?f=19091
-            "useAdaptive": False,
-
-            # set to true if the order is a FX conversion order
-            "isCurrencyConversion": False,
-
-            # Set the allocation method when placing an order using an FA account
-            # for a group Possible allocation methods are "NetLiquidity",
-            # "AvailableEquity", "EqualQuantity" and "PctChange".
-            "allocationMethod": None
+        # Define order according to dict
+        order_dict = {
+            "STP LMT": {"orderType": order_type, "totalQuantity": qty,
+                        "AuxPrice": stop_price,
+                        "LmtPrice": limit_price, "action": side},
+            "STP": {"orderType": order_type, "totalQuantity": qty,
+                    "AuxPrice": stop_price, "action": side},
+            "LMT": {"orderType": order_type, "totalQuantity": qty,
+                    "LmtPrice": limit_price, "action": side},
+            "MKT": {"orderType": order_type, "totalQuantity": qty, "action": side},
         }
 
-        order_response = requests.post("https://localhost:5000/v1/api/iserver/account/" +
-                                      account_id + "/order", verify=False,
-                                      data=order_body)
-        order_response = order_response.json()
+        order_definition = order_dict[order_type]
 
-        return [order_body, order_response]
+        order = Order(**order_definition)
+
+        # Define contract (which asset)
+        contract = Stock(symbol=symbol, exchange="SMART", currency=currency)
+
+        # Place order, send request
+        trade = ib.placeOrder(contract, order)
+
+        # Confirm submission
+        assert trade.orderStatus.status == 'Submitted'
+
+        trade_dict = trade.dict()
+
+        return [trade_dict, trade]
 
     def list_orders(self) -> Dict:
         """List orders.
