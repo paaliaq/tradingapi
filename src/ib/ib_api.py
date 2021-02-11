@@ -90,47 +90,82 @@ class IbApi(BaseApi):
 
         return [trade_dict, trade]
 
-    def list_orders(self) -> list[Dict]:
+    def list_orders(self) -> list[Dict, ]:
         """List orders.
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """
-        open_orders = [x.dict() for x in ib.reqAllOpenOrders()]
+        open_orders_dict = [x.dict() for x in ib.reqAllOpenOrders()]
 
-        return open_orders
+        return open_orders_dict
 
     def get_order(self, order_id: str) -> Dict:
         """Get an order with specific order_id."""
-        return None
+        for x in ib.reqAllOpenOrders():
+            if x.permId == int(order_id):  # This is is unqiue
+                order = x.dict()
 
-    def cancel_order(self, order_id: str, account_id: str) -> Dict:
-        """Cancel an order with specific order_id."""
-        #  Must call /iserver/accounts endpoint prior to cancelling an order.
-        requests.get("https://localhost:5000/v1/api/iserver/accounts",
-                              verify=False)
-        response = requests.delete("https://localhost:5000/v1/api/iserver/account/" +
-                                   account_id + "/order/" + order_id, verify=False)
-        response_content = response.json()
-        return response_content
+        return order
 
-    def cancel_all_orders(self) -> None:
+    def cancel_order(self, order_id: str) -> Dict:
+        """Cancel an order with specific order_id.
+        """
+        for x in ib.reqAllOpenOrders():
+            if x.permId == int(order_id):
+                order = x
+
+        trade = ib.cancelOrder(order)
+
+        trade_dict = trade.dict()
+
+        return trade_dict
+
+    def cancel_all_orders(self) -> List[Dict]:
         """Cancel all orders."""
+        cancelled_orders = []
+        for x in ib.reqAllOpenOrders():
+            order = x
+            trade = ib.cancelOrder(order)
+            trade_dict = trade.dict()
+            cancelled_orders.append(trade_dict)
 
-    def list_positions(self) -> Position:
+        return cancelled_orders
+
+    def list_positions(self) -> List[Dict]:
         """Get a list of open positions."""
-        positions = ib.positions()
-
+        positions = []
+        for x in range(0, len(ib.positions())):
+            positions.append({"account": ib.positions()[x].account,
+                              "contract": ib.positions()[x].contract.dict(),
+                              "quantity": ib.positions()[x].position,
+                              "avgCost": ib.positions()[x].avgCost})
         return positions
 
     def get_position(self, symbol: str) -> Dict:
         """Get an open position for a symbol."""
-        return None
+        positions = self.list_positions()
+
+        for x in positions:
+            if x["contract"]["symbol"] == symbol:
+                position = x
+
+        return position
 
     def close_position(self, symbol: str) -> Dict:
         """Liquidates the position for the given symbol at market price."""
-        self.list_positions() # Extract specific one
-        self.submit_order()
-        return None
+        for x in range(0, len(ib.positions())):
+            if ib.positions()[x].contract.symbol == symbol:
+                old_contract = ib.positions()[x].contract
+                position = ib.positions()[x].position
+
+        # Define sell contract according to current contract/position
+        new_contract = Stock(conId=old_contract.conId)
+        new_contract = ib.qualifyContracts(new_contract)
+
+        order = MarketOrder("SELL", position)
+        trade = ib.placeOrder(new_contract[0], order)
+
+        return trade.dict()
 
     def close_all_positions(self) -> List[Dict]:
         """Liquidates all open positions at market price."""
