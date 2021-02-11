@@ -24,6 +24,8 @@ class IbApi(BaseApi):
         """Get the accounts associated with login."""
         accounts = ib.client.getAccounts()
 
+        self.accounts = accounts
+
         return accounts
 
     def submit_order(self,
@@ -88,16 +90,14 @@ class IbApi(BaseApi):
 
         return [trade_dict, trade]
 
-    def list_orders(self) -> Dict:
+    def list_orders(self) -> list[Dict]:
         """List orders.
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """
-        response = requests.get("https://localhost:5000/v1/api/iserver/account/orders",
-                              verify=False)
-        orders = response.json()["orders"]
+        open_orders = [x.dict() for x in ib.reqAllOpenOrders()]
 
-        return orders
+        return open_orders
 
     def get_order(self, order_id: str) -> Dict:
         """Get an order with specific order_id."""
