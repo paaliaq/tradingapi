@@ -22,15 +22,9 @@ class BaseApi(ABC):
         qty: int,
         side: str,
         type: str,
-        time_in_force: str,
         limit_price: str = None,
         stop_price: str = None,
-        extended_hours: bool = None,
-        order_class: str = None,
-        take_profit: dict = None,
-        stop_loss: dict = None,
-        trail_price: str = None,
-        trail_percent: str = None,
+        currency: str = None
     ) -> Dict:
         """Submit an order.
 
@@ -39,39 +33,18 @@ class BaseApi(ABC):
             qty: int
             side: buy or sell
             type: market, limit, stop, stop_limit or trailing_stop
-            time_in_force: day, gtc, opg, cls, ioc, fok
             limit_price: str of float
             stop_price: str of float
-            extended_hours: bool. If true, order will be eligible to execute
-                in premarket/afterhours.
-            order_class: simple, bracket, oco or oto
-            take_profit: dict with field "limit_price" e.g
-                {"limit_price": "298.95"}
-            stop_loss: dict with fields "stop_price" and "limit_price" e.g
-                {"stop_price": "297.95", "limit_price": "298.95"}
-            trail_price: str of float
-            trail_percent: str of float
+            currency:str, currency of traded exchange stock
         """
         pass
 
     @abstractmethod
-    def list_orders(
-        self,
-        status: str = None,
-        limit: int = None,
-        after: str = None,
-        until: str = None,
-        direction: str = None,
-    ) -> List[Dict]:
+    def list_orders(self) -> List[Dict]:
         """List orders.
 
         Args:
-            status: open, closed or all. Defaults to open.
-            limit: Defaults to 50 and max is 500
-            after: timestamp
-            until: timestamp
-            direction: asc or desc.
-
+            Defaults to open.
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """

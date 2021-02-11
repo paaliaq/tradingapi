@@ -4,7 +4,8 @@ from ib_insync import *
 
 from src.base.base_api import BaseApi
 
-
+# TODO test all functions
+# TODO Write comments
 class IbApi(BaseApi):
     """Class for Alpaca API.
 
@@ -33,9 +34,9 @@ class IbApi(BaseApi):
                      currency: str = None,
                      qty: float = None,
                      side: str = None,
-                     order_type: str = "MKT",
+                     type: str = "MKT",
                      limit_price: float = None,
-                     stop_price: float = None) -> List[Dict]:
+                     stop_price: float = None) -> Dict:
         """Submit an order.
 
                 Args:
@@ -47,7 +48,7 @@ class IbApi(BaseApi):
 
                     side: str, "SELL" or "BUY", direction.
 
-                    order_type: str = "MKT", Can be one of "MKT" (Market), "LMT" (Limit),
+                    type: str = "MKT", Can be one of "MKT" (Market), "LMT" (Limit),
                     "STP" (Stop) or "STP_LIMIT" (stop limit)
 
                     extended_hours: bool, If true, order will be eligible to execute
@@ -63,17 +64,17 @@ class IbApi(BaseApi):
 
         # Define order according to dict
         order_dict = {
-            "STP LMT": {"orderType": order_type, "totalQuantity": qty,
+            "STP LMT": {"orderType": type, "totalQuantity": qty,
                         "AuxPrice": stop_price,
                         "LmtPrice": limit_price, "action": side},
-            "STP": {"orderType": order_type, "totalQuantity": qty,
+            "STP": {"orderType": type, "totalQuantity": qty,
                     "AuxPrice": stop_price, "action": side},
-            "LMT": {"orderType": order_type, "totalQuantity": qty,
+            "LMT": {"orderType": type, "totalQuantity": qty,
                     "LmtPrice": limit_price, "action": side},
-            "MKT": {"orderType": order_type, "totalQuantity": qty, "action": side},
+            "MKT": {"orderType": type, "totalQuantity": qty, "action": side},
         }
 
-        order_definition = order_dict[order_type]
+        order_definition = order_dict[type]
 
         order = Order(**order_definition)
 
@@ -88,13 +89,18 @@ class IbApi(BaseApi):
 
         trade_dict = trade.dict()
 
-        return [trade_dict, trade]
+        return trade_dict
 
-    def list_orders(self) -> list[Dict, ]:
+    def list_orders(self) -> list[Dict]:
         """List orders.
+
+        Args:
+            Defaults to open.
+
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """
+
         open_orders_dict = [x.dict() for x in ib.reqAllOpenOrders()]
 
         return open_orders_dict
@@ -169,15 +175,18 @@ class IbApi(BaseApi):
 
     def close_all_positions(self) -> List[Dict]:
         """Liquidates all open positions at market price."""
-        self.list_positions() # Extract specific one
+        closed_positions = []
+        for x in range(0, len(ib.positions())):
+            old_contract = ib.positions()[x].contract
+            position = ib.positions()[x].position
 
-        return None
+            # Define sell contract according to current contract/position
+            new_contract = Stock(conId=old_contract.conId)
+            new_contract = ib.qualifyContracts(new_contract)
 
-    def extend_session(self) -> str:
-        """Extends interactive session."""
-        response = requests.post("https://localhost:5000/v1/api/tickle", verify=False)
-        return response.status_code
+            order = MarketOrder("SELL", position)
+            trade = ib.placeOrder(new_contract[0], order)
 
-    def end_session(self):
-        """Extends interactive session."""
-        ib.disconnect()
+            closed_positions.append(trade.dict())
+
+        return closed_positions
