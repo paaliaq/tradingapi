@@ -45,6 +45,7 @@ class BaseApi(ABC):
 
         Args:
             Defaults to open.
+
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """
