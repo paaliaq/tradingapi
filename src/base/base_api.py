@@ -12,7 +12,7 @@ class BaseApi(ABC):
     For reference, please see: https://github.com/alpacahq/alpaca-trade-api-python
     """
 
-    def __init__(self, env_dict: dict) -> None:
+    def __init__(self, env_dict: Dict) -> None:
         """Class initialization function."""
         # Check inputs
         is_dict = isinstance(env_dict, dict) or isinstance(env_dict, OrderedDict)

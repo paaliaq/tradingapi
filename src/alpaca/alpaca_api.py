@@ -12,7 +12,7 @@ class AlpacaApi(BaseApi):
     For reference, please see: https://github.com/alpacahq/alpaca-trade-api-python
     """
 
-    def __init__(self, env_dict: dict) -> None:
+    def __init__(self, env_dict: Dict) -> None:
         """Class initialization function."""
         super().__init__(env_dict)  # type: ignore
         self.api = tradeapi.REST()
