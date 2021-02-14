@@ -7,19 +7,20 @@ from src.base.base_api import BaseApi
 # TODO test all functions
 # TODO Write comments
 class IbApi(BaseApi):
-    """Class for Alpaca API.
+    """Class for interactive broker API.
 
-    This class is using the interactive broker api.
-    For reference, please see:
-    https://interactivebrokers.com/api/doc.html
-    and
-    https://www.interactivebrokers.com/en/trading/ib-api.php
+    This class use the package ib-insync for making asynchronous requests toward
+    interactive broker trading work station (TWS) api.
+    For reference of TWS, please see:
+    https://interactivebrokers.github.io/tws-api/index.html
+    and for ib-insync
+    https://rawgit.com/erdewit/ib_insync/master/docs/html/readme.html
     """
 
     def __init__(self):
         """Class initialization function."""
         ib = IB()
-        ib.connect('127.0.0.1', 4002, clientId=13) # Todo change?
+        ib.connect('127.0.0.1', 4002, clientId=13)  # Ports
 
     def get_account(self) -> List:
         """Get the accounts associated with login."""
@@ -42,26 +43,22 @@ class IbApi(BaseApi):
                 Args:
                     symbol: str = None, Selected asset for trade
 
-                    currency str = None, The underlying’s currency.
+                    currency str = None, The assets underlying currency (traded in).
 
-                    qty: float, quantity traded.
+                    qty: float, quantity bought or sold.
 
                     side: str, "SELL" or "BUY", direction.
 
                     type: str = "MKT", Can be one of "MKT" (Market), "LMT" (Limit),
                     "STP" (Stop) or "STP_LIMIT" (stop limit)
 
-                    extended_hours: bool, If true, order will be eligible to execute
-                    in premarket/afterhours.
+                    limit_price: float = None,
 
-                     limit_price: float = None,
-
-                     stop_price: float = None,
+                    stop_price: float = None,
 
                 Returns:
-                    List[Dict, Trade]: A list containing dictionary of trade and Trade object
+                    List[Dict]: A list containing the order, based of trade object.
                 """
-
         # Define order according to dict
         order_dict = {
             "STP LMT": {"orderType": type, "totalQuantity": qty,
@@ -73,12 +70,10 @@ class IbApi(BaseApi):
                     "LmtPrice": limit_price, "action": side},
             "MKT": {"orderType": type, "totalQuantity": qty, "action": side},
         }
-
         order_definition = order_dict[type]
+        order = Order(**order_definition)  # Place order
 
-        order = Order(**order_definition)
-
-        # Define contract (which asset)
+        # Define contract (which asset being traded)
         contract = Stock(symbol=symbol, exchange="SMART", currency=currency)
 
         # Place order, send request
@@ -94,13 +89,9 @@ class IbApi(BaseApi):
     def list_orders(self) -> list[Dict]:
         """List orders.
 
-        Args:
-            Defaults to open.
-
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """
-
         open_orders_dict = [x.dict() for x in ib.reqAllOpenOrders()]
 
         return open_orders_dict
@@ -108,19 +99,18 @@ class IbApi(BaseApi):
     def get_order(self, order_id: str) -> Dict:
         """Get an order with specific order_id."""
         for x in ib.reqAllOpenOrders():
-            if x.permId == int(order_id):  # This is is unqiue
+            if x.permId == int(order_id):  # Order id is unique
                 order = x.dict()
 
         return order
 
     def cancel_order(self, order_id: str) -> Dict:
-        """Cancel an order with specific order_id.
-        """
+        """Cancel an order with specific order_id."""
         for x in ib.reqAllOpenOrders():
-            if x.permId == int(order_id):
+            if x.permId == int(order_id):  # Order id is unique
                 order = x
 
-        trade = ib.cancelOrder(order)
+        trade = ib.cancelOrder(order)  # Requires order object for cancellation
 
         trade_dict = trade.dict()
 
@@ -166,8 +156,9 @@ class IbApi(BaseApi):
 
         # Define sell contract according to current contract/position
         new_contract = Stock(conId=old_contract.conId)
-        new_contract = ib.qualifyContracts(new_contract)
+        new_contract = ib.qualifyContracts(new_contract)  # Validates the contract
 
+        # Place an order using a contract and order object.
         order = MarketOrder("SELL", position)
         trade = ib.placeOrder(new_contract[0], order)
 
@@ -182,8 +173,9 @@ class IbApi(BaseApi):
 
             # Define sell contract according to current contract/position
             new_contract = Stock(conId=old_contract.conId)
-            new_contract = ib.qualifyContracts(new_contract)
+            new_contract = ib.qualifyContracts(new_contract)  # Validates the contract
 
+            # Place an order using a contract and order object.
             order = MarketOrder("SELL", position)
             trade = ib.placeOrder(new_contract[0], order)
 
