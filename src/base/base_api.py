@@ -19,12 +19,12 @@ class BaseApi(ABC):
     def submit_order(
         self,
         symbol: str,
-        qty: int,
+        qty: float,
         side: str,
         type: str,
-        limit_price: str = None,
-        stop_price: str = None,
-        currency: str = None
+        currency: str,
+        limit_price: float = None,
+        stop_price: float = None,
     ) -> Dict:
         """Submit an order.
 
@@ -33,8 +33,8 @@ class BaseApi(ABC):
             qty: int
             side: buy or sell
             type: market, limit, stop, stop_limit or trailing_stop
-            limit_price: str of float
-            stop_price: str of float
+            limit_price: float
+            stop_price: float
             currency:str, currency of traded exchange stock
         """
         pass
@@ -62,7 +62,7 @@ class BaseApi(ABC):
         pass
 
     @abstractmethod
-    def cancel_all_orders(self) -> None:
+    def cancel_all_orders(self) -> List[Dict]:
         """Cancel all orders."""
         pass
 

@@ -1,10 +1,11 @@
 """Base class for trading APIs."""
 from typing import Dict, List
 import ib_insync as ibin
+import collections
 
 from src.base.base_api import BaseApi
 
-# TODO test all functions
+
 class IbApi(BaseApi):
     """Class for interactive broker API.
 
@@ -18,8 +19,8 @@ class IbApi(BaseApi):
 
     def __init__(self) -> None:
         """Class initialization function."""
-        self.ib = ibin.IB()
-        self.ib.connect('127.0.0.1', 4002, clientId=13)  # Ports
+        self.ib = ibin.ib.IB()
+        self.ib.connect("127.0.0.1", 4002, clientId=13)  # Ports
 
     def get_account(self) -> Dict:
         """Get the accounts associated with login."""
@@ -29,42 +30,55 @@ class IbApi(BaseApi):
 
         return accounts
 
-    def submit_order(self,
-                     symbol: str,
-                     currency: str,
-                     qty: float = None,
-                     side: str = None,
-                     type: str = "MKT",
-                     limit_price: float = None,
-                     stop_price: float = None,
-                     ) -> Dict:
+    def submit_order(
+        self,
+        symbol: str,
+        qty: float,
+        side: str,
+        type: str,
+        currency: str,
+        limit_price: float = None,
+        stop_price: float = None,
+    ) -> Dict:
         """Create and submit an order.
 
         Args:
-            symbol: str = None, Selected asset for trade
-            currency str = None, The assets underlying currency (traded in).
+            symbol: str, Selected asset for trade
             qty: float, quantity bought or sold.
             side: str, "SELL" or "BUY", direction.
-            type: str = "MKT", Can be one of "MKT" (Market), "LMT" (Limit),
-            "STP" (Stop) or "STP_LIMIT" (stop limit)
+            type: str, Can be one of "MKT" (Market), "LMT" (Limit),
+                "STP" (Stop) or "STP_LIMIT" (stop limit).
+            currency: str, The assets underlying currency (traded in).
             limit_price: float = None,
             stop_price: float = None,
 
         Returns:
-            List[Dict]: A list containing the order, based of trade object.
+            Dict: A list containing the order, based of trade object.
         """
         # Define order according to dict
         order_dict = {
-            "STP LMT": {"orderType": type, "totalQuantity": qty,
-                        "AuxPrice": stop_price,
-                        "LmtPrice": limit_price, "action": side},
-            "STP": {"orderType": type, "totalQuantity": qty,
-                    "AuxPrice": stop_price, "action": side},
-            "LMT": {"orderType": type, "totalQuantity": qty,
-                    "LmtPrice": limit_price, "action": side},
+            "STP LMT": {
+                "orderType": type,
+                "totalQuantity": qty,
+                "AuxPrice": stop_price,
+                "LmtPrice": limit_price,
+                "action": side,
+            },
+            "STP": {
+                "orderType": type,
+                "totalQuantity": qty,
+                "AuxPrice": stop_price,
+                "action": side,
+            },
+            "LMT": {
+                "orderType": type,
+                "totalQuantity": qty,
+                "LmtPrice": limit_price,
+                "action": side,
+            },
             "MKT": {"orderType": type, "totalQuantity": qty, "action": side},
         }
-        order_definition = order_dict[type]
+        order_definition = collections.OrderedDict(order_dict[type])  # mypy workaround
         order = ibin.order.Order(**order_definition)  # Place order
 
         # Define contract (which asset being traded)
@@ -74,13 +88,13 @@ class IbApi(BaseApi):
         trade = self.ib.client.placeOrder(contract, order)
 
         # Confirm submission
-        assert trade.orderStatus.status == 'Submitted'
+        assert trade.orderStatus.status == "Submitted"
 
         trade_dict = trade.dict()
 
         return trade_dict
 
-    def list_orders(self) -> list[Dict]:
+    def list_orders(self) -> List[Dict]:
         """List orders.
 
         Returns:
@@ -104,7 +118,7 @@ class IbApi(BaseApi):
             if x.permId == int(order_id):  # Order id is unique
                 order = x
 
-        trade = self.ib.client.cancelOrder(order)  # Requires order object for cancellation
+        trade = self.ib.client.cancelOrder(order)
 
         trade_dict = trade.dict()
 
@@ -125,10 +139,14 @@ class IbApi(BaseApi):
         """Get a list of open positions."""
         positions = []
         for x in range(0, len(self.ib.positions())):
-            positions.append({"account": self.ib.positions()[x].account,
-                              "contract": self.ib.positions()[x].contract.dict(),
-                              "quantity": self.ib.positions()[x].position,
-                              "avgCost": self.ib.positions()[x].avgCost})
+            positions.append(
+                {
+                    "account": self.ib.positions()[x].account,
+                    "contract": self.ib.positions()[x].contract.__dict__,
+                    "quantity": self.ib.positions()[x].position,
+                    "avgCost": self.ib.positions()[x].avgCost,
+                }
+            )
         return positions
 
     def get_position(self, symbol: str) -> Dict:
@@ -149,12 +167,12 @@ class IbApi(BaseApi):
                 position = self.ib.positions()[x].position
 
         # Define sell contract according to current contract/position
-        new_contract = ibin.contract.Stock(conId=old_contract.conId)
-        new_contract = self.ib.qualifyContracts(new_contract)  # Validates the contract
+        new_contract = ibin.Stock(conId=old_contract.conId)
+        self.ib.qualifyContracts(new_contract)  # Validates the contract
 
         # Place an order using a contract and order object.
         order = ibin.order.MarketOrder("SELL", position)
-        trade = self.ib.client.placeOrder(new_contract[0], order)
+        trade = self.ib.client.placeOrder(new_contract, order)
 
         return trade.dict()
 
@@ -167,7 +185,7 @@ class IbApi(BaseApi):
 
             # Define sell contract according to current contract/position
             new_contract = ibin.Stock(conId=old_contract.conId)
-            new_contract = self.ib.qualifyContracts(new_contract)  # Validates the contract
+            self.ib.qualifyContracts(new_contract)  # Validates the contract
 
             # Place an order using a contract and order object.
             order = ibin.order.MarketOrder("SELL", position)
