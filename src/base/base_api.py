@@ -57,7 +57,7 @@ class BaseApi(ABC):
         pass
 
     @abstractmethod
-    def cancel_order(self, order_id: str) -> None:
+    def cancel_order(self, order_id: str) -> Dict:
         """Cancel an order with specific order_id."""
         pass
 

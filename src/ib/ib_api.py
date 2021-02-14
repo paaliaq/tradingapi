@@ -30,13 +30,13 @@ class IbApi(BaseApi):
         return accounts
 
     def submit_order(self,
-                     symbol: str = None,
+                     symbol: str,
+                     currency: str,
                      qty: float = None,
                      side: str = None,
                      type: str = "MKT",
                      limit_price: float = None,
                      stop_price: float = None,
-                     currency: str = None,
                      ) -> Dict:
         """Create and submit an order.
 
@@ -65,13 +65,13 @@ class IbApi(BaseApi):
             "MKT": {"orderType": type, "totalQuantity": qty, "action": side},
         }
         order_definition = order_dict[type]
-        order = ibin.Order(**order_definition)  # Place order
+        order = ibin.order.Order(**order_definition)  # Place order
 
         # Define contract (which asset being traded)
         contract = ibin.Stock(symbol=symbol, exchange="SMART", currency=currency)
 
         # Place order, send request
-        trade = self.ib.placeOrder(contract, order)
+        trade = self.ib.client.placeOrder(contract, order)
 
         # Confirm submission
         assert trade.orderStatus.status == 'Submitted'
@@ -86,13 +86,13 @@ class IbApi(BaseApi):
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """
-        open_orders_dict = [x.dict() for x in self.ib.reqAllOpenOrders()]
+        open_orders_dict = [x.dict() for x in self.ib.client.reqAllOpenOrders()]
 
         return open_orders_dict
 
     def get_order(self, order_id: str) -> Dict:
         """Get an order with specific order_id."""
-        for x in self.ib.reqAllOpenOrders():
+        for x in self.ib.client.reqAllOpenOrders():
             if x.permId == int(order_id):  # Order id is unique
                 order = x.dict()
 
@@ -100,11 +100,11 @@ class IbApi(BaseApi):
 
     def cancel_order(self, order_id: str) -> Dict:
         """Cancel an order with specific order_id."""
-        for x in self.ib.reqAllOpenOrders():
+        for x in self.ib.client.reqAllOpenOrders():
             if x.permId == int(order_id):  # Order id is unique
                 order = x
 
-        trade = self.ib.cancelOrder(order)  # Requires order object for cancellation
+        trade = self.ib.client.cancelOrder(order)  # Requires order object for cancellation
 
         trade_dict = trade.dict()
 
@@ -115,7 +115,7 @@ class IbApi(BaseApi):
         cancelled_orders = []
         for x in self.ib.reqAllOpenOrders():
             order = x
-            trade = self.ib.cancelOrder(order)
+            trade = self.ib.client.cancelOrder(order)
             trade_dict = trade.dict()
             cancelled_orders.append(trade_dict)
 
@@ -149,12 +149,12 @@ class IbApi(BaseApi):
                 position = self.ib.positions()[x].position
 
         # Define sell contract according to current contract/position
-        new_contract = Stock(conId=old_contract.conId)
+        new_contract = ibin.contract.Stock(conId=old_contract.conId)
         new_contract = self.ib.qualifyContracts(new_contract)  # Validates the contract
 
         # Place an order using a contract and order object.
-        order = ibin.MarketOrder("SELL", position)
-        trade = self.ib.placeOrder(new_contract[0], order)
+        order = ibin.order.MarketOrder("SELL", position)
+        trade = self.ib.client.placeOrder(new_contract[0], order)
 
         return trade.dict()
 
@@ -170,8 +170,8 @@ class IbApi(BaseApi):
             new_contract = self.ib.qualifyContracts(new_contract)  # Validates the contract
 
             # Place an order using a contract and order object.
-            order = ibin.MarketOrder("SELL", position)
-            trade = self.ib.placeOrder(new_contract[0], order)
+            order = ibin.order.MarketOrder("SELL", position)
+            trade = self.ib.client.placeOrder(new_contract, order)
 
             closed_positions.append(trade.dict())
 
