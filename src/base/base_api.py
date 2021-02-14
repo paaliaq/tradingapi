@@ -1,5 +1,7 @@
 """Base class for trading APIs."""
+import os
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 from typing import Dict, List
 
 
@@ -9,6 +11,21 @@ class BaseApi(ABC):
     This class was inspired by the methods from alpaca-trade-api-python.
     For reference, please see: https://github.com/alpacahq/alpaca-trade-api-python
     """
+
+    def __init__(self, env_dict: dict) -> None:
+        """Class initialization function."""
+        # Check inputs
+        is_dict = isinstance(env_dict, dict) or isinstance(env_dict, OrderedDict)
+        if not is_dict:
+            raise ValueError("env_dict must be a dictionary.")
+
+        values_are_strings = all([isinstance(v, str) for v in env_dict.values()])
+        if not values_are_strings:
+            raise ValueError("All values in env_dict must be strings.")
+
+        # Set environment variables
+        for k, v in env_dict.items():
+            os.environ[k] = v
 
     @abstractmethod
     def get_account(self) -> Dict:

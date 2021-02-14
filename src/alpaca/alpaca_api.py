@@ -12,11 +12,10 @@ class AlpacaApi(BaseApi):
     For reference, please see: https://github.com/alpacahq/alpaca-trade-api-python
     """
 
-    def __init__(self, key_id: str, secret_key: str, base_url: str):
+    def __init__(self, env_dict: dict) -> None:
         """Class initialization function."""
-        self.api = tradeapi.REST(
-            key_id=key_id, secret_key=secret_key, base_url=base_url
-        )
+        super().__init__(env_dict)  # type: ignore
+        self.api = tradeapi.REST()
 
     def get_account(self) -> Dict:
         """Get the account."""
