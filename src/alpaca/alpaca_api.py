@@ -1,38 +1,28 @@
 """Base class for trading APIs."""
-import os
-from abc import ABC, abstractmethod
-from collections import OrderedDict
 from typing import Dict, List
 
+import alpaca_trade_api as tradeapi
+from src.base.base_api import BaseApi
 
-class BaseApi(ABC):
-    """Base class for trading APIs.
 
-    This class was inspired by the methods from alpaca-trade-api-python.
+class AlpacaApi(BaseApi):
+    """Class for Alpaca API.
+
+    This class is based on alpaca-trade-api-python.
     For reference, please see: https://github.com/alpacahq/alpaca-trade-api-python
     """
 
     def __init__(self, env_dict: Dict) -> None:
         """Class initialization function."""
-        # Check inputs
-        is_dict = isinstance(env_dict, dict) or isinstance(env_dict, OrderedDict)
-        if not is_dict:
-            raise ValueError("env_dict must be a dictionary.")
+        super().__init__(env_dict)  # type: ignore
+        self.api = tradeapi.REST()
 
-        values_are_strings = all([isinstance(v, str) for v in env_dict.values()])
-        if not values_are_strings:
-            raise ValueError("All values in env_dict must be strings.")
-
-        # Set environment variables
-        for k, v in env_dict.items():
-            os.environ[k] = v
-
-    @abstractmethod
     def get_account(self) -> Dict:
         """Get the account."""
-        pass
+        account = self.api.get_account()
+        account_dict = account.__dict__["_raw"]
+        return account_dict
 
-    @abstractmethod
     def submit_order(
         self,
         symbol: str,
@@ -68,10 +58,28 @@ class BaseApi(ABC):
                 {"stop_price": "297.95", "limit_price": "298.95"}
             trail_price: str of float
             trail_percent: str of float
-        """
-        pass
 
-    @abstractmethod
+        Returns:
+            Dict: a dictionary containing order information
+        """
+        order = self.api.submit_order(
+            symbol=symbol,
+            qty=qty,
+            side=side,
+            type=type,
+            time_in_force=time_in_force,
+            limit_price=limit_price,
+            stop_price=stop_price,
+            extended_hours=extended_hours,
+            order_class=order_class,
+            take_profit=take_profit,
+            stop_loss=stop_loss,
+            trail_price=trail_price,
+            trail_percent=trail_percent,
+        )
+        order_dict = order.__dict__["_raw"]
+        return order_dict
+
     def list_orders(
         self,
         status: str = None,
@@ -92,39 +100,47 @@ class BaseApi(ABC):
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """
-        pass
+        order_list = self.api.list_orders(
+            status=status, limit=limit, after=after, until=until, direction=direction
+        )
+        order_list = [order.__dict__["_raw"] for order in order_list]
 
-    @abstractmethod
+        return order_list
+
     def get_order(self, order_id: str) -> Dict:
         """Get an order with specific order_id."""
-        pass
+        order = self.api.get_order(order_id=order_id)
+        order_dict = order.__dict__["_raw"]
+        return order_dict
 
-    @abstractmethod
     def cancel_order(self, order_id: str) -> None:
         """Cancel an order with specific order_id."""
-        pass
+        self.api.cancel_order(order_id=order_id)
 
-    @abstractmethod
     def cancel_all_orders(self) -> None:
         """Cancel all orders."""
-        pass
+        self.api.cancel_all_orders()
 
-    @abstractmethod
     def list_positions(self) -> List[Dict]:
         """Get a list of open positions."""
-        pass
+        position_list = self.api.list_positions()
+        position_list = [position.__dict__["_raw"] for position in position_list]
+        return position_list
 
-    @abstractmethod
     def get_position(self, symbol: str) -> Dict:
         """Get an open position for a symbol."""
-        pass
+        position = self.api.get_position(symbol=symbol)
+        position_dict = position.__dict__["_raw"]
+        return position_dict
 
-    @abstractmethod
     def close_position(self, symbol: str) -> Dict:
         """Liquidates the position for the given symbol at market price."""
-        pass
+        position = self.api.close_position(symbol=symbol)
+        position_dict = position.__dict__["_raw"]
+        return position_dict
 
-    @abstractmethod
     def close_all_positions(self) -> List[Dict]:
         """Liquidates all open positions at market price."""
-        pass
+        position_list = self.api.close_all_positions()
+        position_list = [position.__dict__["_raw"] for position in position_list]
+        return position_list
