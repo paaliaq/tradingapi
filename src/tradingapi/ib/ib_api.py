@@ -3,7 +3,7 @@ from typing import Dict, List
 import ib_insync as ibin
 import collections
 
-from src.base.base_api import BaseApi
+from tradingapi.base.base_api import BaseApi
 
 
 class IbApi(BaseApi):
