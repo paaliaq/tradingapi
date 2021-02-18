@@ -60,37 +60,39 @@ class IbApi(BaseApi):
             "STP LMT": {
                 "orderType": type,
                 "totalQuantity": qty,
-                "AuxPrice": stop_price,
-                "LmtPrice": limit_price,
+                "auxPrice": stop_price,
+                "lmtPrice": limit_price,
                 "action": side,
             },
             "STP": {
                 "orderType": type,
                 "totalQuantity": qty,
-                "AuxPrice": stop_price,
+                "auxPrice": stop_price,
                 "action": side,
             },
             "LMT": {
                 "orderType": type,
                 "totalQuantity": qty,
-                "LmtPrice": limit_price,
+                "lmtPrice": limit_price,
                 "action": side,
             },
             "MKT": {"orderType": type, "totalQuantity": qty, "action": side},
         }
         order_definition = collections.OrderedDict(order_dict[type])  # mypy workaround
-        order = ibin.order.Order(**order_definition)  # Place order
+
+        order = ibin.Order(**order_definition)  # Place order
 
         # Define contract (which asset being traded)
         contract = ibin.Stock(symbol=symbol, exchange="SMART", currency=currency)
 
         # Place order, send request
-        trade = self.ib.client.placeOrder(contract, order)
+        trade = self.ib.placeOrder(contract=contract, order=order).__dict__
 
         # Confirm submission
-        assert trade.orderStatus.status == "Submitted"
+        self.ib.sleep(2)
+        assert order in self.ib.orders()
 
-        trade_dict = trade.dict()
+        trade_dict = trade.__dict__
 
         return trade_dict
 
@@ -100,37 +102,43 @@ class IbApi(BaseApi):
         Returns:
             List[Dict]: a list of dictionaries containing order information
         """
-        open_orders_dict = [x.dict() for x in self.ib.client.reqAllOpenOrders()]
+        open_orders_dict = [x.__dict__ for x in self.ib.reqAllOpenOrders()]
 
         return open_orders_dict
 
     def get_order(self, order_id: str) -> Dict:
         """Get an order with specific order_id."""
-        for x in self.ib.client.reqAllOpenOrders():
-            if x.permId == int(order_id):  # Order id is unique
-                order = x.dict()
+        open_orders = self.ib.reqAllOpenOrders()
+        for order in open_orders:
+            if order.permId == int(order_id):  # Order id is unique
+                order_dict = order.__dict__
 
-        return order
+        if "order_dict" not in locals():
+            print("Order doesn't exist!")
+            order_dict = {}
+
+        return order_dict
 
     def cancel_order(self, order_id: str) -> Dict:
         """Cancel an order with specific order_id."""
-        for x in self.ib.client.reqAllOpenOrders():
-            if x.permId == int(order_id):  # Order id is unique
-                order = x
-
-        trade = self.ib.client.cancelOrder(order)
-
-        trade_dict = trade.dict()
+        open_orders = self.ib.reqAllOpenOrders()
+        for order in open_orders:
+            if order.permId == int(order_id):  # Order id is unique
+                trade = self.ib.cancelOrder(order)
+                trade_dict = trade.__dict__
+        if "trade_dict" not in locals():
+            print("Order doesn't exist!")
+            trade_dict = {}
 
         return trade_dict
 
     def cancel_all_orders(self) -> List[Dict]:
         """Cancel all orders."""
         cancelled_orders = []
-        for x in self.ib.reqAllOpenOrders():
-            order = x
-            trade = self.ib.client.cancelOrder(order)
-            trade_dict = trade.dict()
+        open_orders = self.ib.reqAllOpenOrders()
+        for order in open_orders:
+            trade = self.ib.cancelOrder(order)
+            trade_dict = trade.__dict__
             cancelled_orders.append(trade_dict)
 
         return cancelled_orders
@@ -157,6 +165,10 @@ class IbApi(BaseApi):
             if x["contract"]["symbol"] == symbol:
                 position = x
 
+        if "position" not in locals():
+            print("Position for symbol doesn't exist!")
+            position = {}
+
         return position
 
     def close_position(self, symbol: str) -> Dict:
@@ -166,15 +178,20 @@ class IbApi(BaseApi):
                 old_contract = self.ib.positions()[x].contract
                 position = self.ib.positions()[x].position
 
+        if "position" not in locals():
+            print("Position for symbol doesn't exist!")
+            return {}
+
         # Define sell contract according to current contract/position
         new_contract = ibin.Stock(conId=old_contract.conId)
         self.ib.qualifyContracts(new_contract)  # Validates the contract
 
         # Place an order using a contract and order object.
-        order = ibin.order.MarketOrder("SELL", position)
-        trade = self.ib.client.placeOrder(new_contract, order)
+        order = ibin.MarketOrder("SELL", position)
+        trade = self.ib.placeOrder(contract=new_contract, order=order)
+        assert order in self.ib.orders()
 
-        return trade.dict()
+        return trade.__dict__
 
     def close_all_positions(self) -> List[Dict]:
         """Liquidates all open positions at market price."""
@@ -183,14 +200,18 @@ class IbApi(BaseApi):
             old_contract = self.ib.positions()[x].contract
             position = self.ib.positions()[x].position
 
+            if "position" not in locals():
+                print("No positions to close!")
+                return [{}]
+
             # Define sell contract according to current contract/position
             new_contract = ibin.Stock(conId=old_contract.conId)
             self.ib.qualifyContracts(new_contract)  # Validates the contract
 
             # Place an order using a contract and order object.
             order = ibin.order.MarketOrder("SELL", position)
-            trade = self.ib.client.placeOrder(new_contract, order)
+            trade = self.ib.placeOrder(new_contract, order)
 
-            closed_positions.append(trade.dict())
+            closed_positions.append(trade.__dict__)
 
         return closed_positions
