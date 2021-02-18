@@ -24,11 +24,18 @@ class IbApi(BaseApi):
 
     def get_account(self) -> Dict:
         """Get the accounts associated with login."""
-        accounts = self.ib.client.getAccounts()
+        accounts_summaries = self.ib.accountSummary()
 
-        self.accounts = accounts
+        account = {}
+        for account_summary in accounts_summaries:
+            if account_summary.account != "ALL":
+                tag = account_summary.tag
+                value = account_summary.value
+                account[tag] = value
 
-        return accounts
+        self.account = account
+
+        return account
 
     def submit_order(
         self,
