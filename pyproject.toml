@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "tradingapi"
-version = "0.6.0"
+version = "0.7.0"
 description = ""
 authors = ["August Andersen", "Julius Kittler"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "3.8.x"
 pandas = "1.1.5"
 numpy = "1.19.4"
 scipy = "1.5.4"
