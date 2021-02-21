@@ -11,7 +11,7 @@ class IbApi(BaseApi):
 
     This class use the package ib-insync for making asynchronous requests toward
     interactive broker trading work station (TWS) api.
-    For reference of TWS, please see:
+    For reference of TWS, please see :
     https://interactivebrokers.github.io/tws-api/index.html
     and for ib-insync
     https://rawgit.com/erdewit/ib_insync/master/docs/html/readme.html
