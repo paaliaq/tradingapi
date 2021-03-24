@@ -28,7 +28,7 @@ class BaseApi(ABC):
             os.environ[k] = v
 
     @abstractmethod
-    def get_account(self) -> Dict:
+    def get_account(self, **kwargs: Any) -> Dict:
         """Get the account."""
         pass
 
@@ -39,9 +39,9 @@ class BaseApi(ABC):
         qty: float,
         side: str,
         type: str,
-        currency: str,
         limit_price: float = None,
         stop_price: float = None,
+        **kwargs: Any
     ) -> Dict:
         """Submit an order.
 
@@ -49,56 +49,49 @@ class BaseApi(ABC):
             symbol: symbol or asset ID
             qty: int
             side: buy or sell
-            type: market, limit, stop, stop_limit or trailing_stop
-            limit_price: float
-            stop_price: float
-            currency:str, currency of traded exchange stock
+            type: market, limit, stop, stop_limit
+            limit_price: the limit price
+            stop_price: the stop price
+            **kwargs: Arbitrary keyword arguments.
         """
         pass
 
     @abstractmethod
-    def list_orders(self) -> List[Dict]:
-        """List orders.
-
-        Args:
-            Defaults to open.
-
-        Returns:
-            List[Dict]: a list of dictionaries containing order information
-        """
+    def list_orders(self, **kwargs: Any) -> List[Dict]:
+        """Get a list with all orders."""
         pass
 
     @abstractmethod
-    def get_order(self, order_id: str) -> Dict:
+    def get_order(self, order_id: str, **kwargs: Any) -> Dict:
         """Get an order with specific order_id."""
         pass
 
     @abstractmethod
-    def cancel_order(self, order_id: str) -> Dict:
+    def cancel_order(self, order_id: str, **kwargs: Any) -> Dict:
         """Cancel an order with specific order_id."""
         pass
 
     @abstractmethod
-    def cancel_all_orders(self) -> List[Dict]:
+    def cancel_all_orders(self, **kwargs: Any) -> List[Dict]:
         """Cancel all orders."""
         pass
 
     @abstractmethod
-    def list_positions(self) -> List[Dict]:
+    def list_positions(self, **kwargs: Any) -> List[Dict]:
         """Get a list of open positions."""
         pass
 
     @abstractmethod
-    def get_position(self, symbol: str) -> Dict:
+    def get_position(self, symbol: str, **kwargs: Any) -> Dict:
         """Get an open position for a symbol."""
         pass
 
     @abstractmethod
-    def close_position(self, symbol: str) -> Dict:
+    def close_position(self, symbol: str, **kwargs: Any) -> Dict:
         """Liquidates the position for the given symbol at market price."""
         pass
 
     @abstractmethod
-    def close_all_positions(self) -> List[Dict]:
+    def close_all_positions(self, **kwargs: Any) -> List[Dict]:
         """Liquidates all open positions at market price."""
         pass

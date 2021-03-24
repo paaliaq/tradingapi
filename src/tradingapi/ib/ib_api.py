@@ -46,6 +46,7 @@ class IbApi(BaseApi):
         currency: str,
         limit_price: float = None,
         stop_price: float = None,
+        **kwargs: Any
     ) -> Dict:
         """Create and submit an order.
 
@@ -55,13 +56,16 @@ class IbApi(BaseApi):
             side: str, "SELL" or "BUY", direction.
             type: str, Can be one of "MKT" (Market), "LMT" (Limit),
                 "STP" (Stop) or "STP_LIMIT" (stop limit).
-            currency: str, The assets underlying currency (traded in).
-            limit_price: float = None,
-            stop_price: float = None,
+            limit_price: the limit price
+            stop_price: the stop price
 
         Returns:
             Dict: A list containing the order, based of trade object.
         """
+        # Initialize default kwargs if necessary
+        if "currency" not in kwargs:
+            currency = "USD"
+
         # Define order according to dict
         order_dict = {
             "STP LMT": {
@@ -103,17 +107,13 @@ class IbApi(BaseApi):
 
         return trade_dict
 
-    def list_orders(self) -> List[Dict]:
-        """List orders.
-
-        Returns:
-            List[Dict]: a list of dictionaries containing order information
-        """
+    def list_orders(self, **kwargs: Any) -> List[Dict]:
+        """Get a list with all orders."""
         open_orders_dict = [x.__dict__ for x in self.ib.reqAllOpenOrders()]
 
         return open_orders_dict
 
-    def get_order(self, order_id: str) -> Dict:
+    def get_order(self, order_id: str, **kwargs: Any) -> Dict:
         """Get an order with specific order_id."""
         open_orders = self.ib.reqAllOpenOrders()
         for order in open_orders:
@@ -126,7 +126,7 @@ class IbApi(BaseApi):
 
         return order_dict
 
-    def cancel_order(self, order_id: str) -> Dict:
+    def cancel_order(self, order_id: str, **kwargs: Any) -> Dict:
         """Cancel an order with specific order_id."""
         open_orders = self.ib.reqAllOpenOrders()
         for order in open_orders:
@@ -139,7 +139,7 @@ class IbApi(BaseApi):
 
         return trade_dict
 
-    def cancel_all_orders(self) -> List[Dict]:
+    def cancel_all_orders(self, **kwargs: Any) -> List[Dict]:
         """Cancel all orders."""
         cancelled_orders = []
         open_orders = self.ib.reqAllOpenOrders()
@@ -150,7 +150,7 @@ class IbApi(BaseApi):
 
         return cancelled_orders
 
-    def list_positions(self) -> List[Dict]:
+    def list_positions(self, **kwargs: Any) -> List[Dict]:
         """Get a list of open positions."""
         positions = []
         for x in range(0, len(self.ib.positions())):
@@ -164,7 +164,7 @@ class IbApi(BaseApi):
             )
         return positions
 
-    def get_position(self, symbol: str) -> Dict:
+    def get_position(self, symbol: str, **kwargs: Any) -> Dict:
         """Get an open position for a symbol."""
         positions = self.list_positions()
 
@@ -178,7 +178,7 @@ class IbApi(BaseApi):
 
         return position
 
-    def close_position(self, symbol: str) -> Dict:
+    def close_position(self, symbol: str, **kwargs: Any) -> Dict:
         """Liquidates the position for the given symbol at market price."""
         for x in range(0, len(self.ib.positions())):
             if self.ib.positions()[x].contract.symbol == symbol:
@@ -200,7 +200,7 @@ class IbApi(BaseApi):
 
         return trade.__dict__
 
-    def close_all_positions(self) -> List[Dict]:
+    def close_all_positions(self, **kwargs: Any) -> List[Dict]:
         """Liquidates all open positions at market price."""
         closed_positions = []
         for x in range(0, len(self.ib.positions())):
