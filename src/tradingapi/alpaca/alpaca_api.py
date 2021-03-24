@@ -1,8 +1,8 @@
 """Base class for trading APIs."""
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import alpaca_trade_api as tradeapi
-from src.base.base_api import BaseApi
+from tradingapi.base.base_api import BaseApi
 
 
 class AlpacaApi(BaseApi):
@@ -17,7 +17,7 @@ class AlpacaApi(BaseApi):
         super().__init__(env_dict)  # type: ignore
         self.api = tradeapi.REST()
 
-    def get_account(self) -> Dict:
+    def get_account(self, **kwargs: Any) -> Dict:
         """Get the account."""
         account = self.api.get_account()
         account_dict = account.__dict__["_raw"]
@@ -29,8 +29,8 @@ class AlpacaApi(BaseApi):
         qty: int,
         side: str,
         type: str,
-        limit_price: str = None,
-        stop_price: str = None,
+        limit_price: float = None,
+        stop_price: float = None,
         **kwargs: Any
     ) -> Dict:
         """Submit an order.
@@ -40,19 +40,19 @@ class AlpacaApi(BaseApi):
             qty: int
             side: buy or sell
             type: market, limit, stop, stop_limit or trailing_stop
-            limit_price: str of float
-            stop_price: str of float
+            limit_price: the limit price
+            stop_price: the stop price
             **kwargs: Arbitrary keyword arguments, among them for instance:
-                time_in_force: day, gtc, opg, cls, ioc, fok
-                extended_hours: bool. If true, order will be eligible to execute
-                    in premarket/afterhours.
-                order_class: simple, bracket, oco or oto
-                take_profit: dict with field "limit_price" e.g
+                time_in_force (str = "day"): day, gtc, opg, cls, ioc, fok
+                extended_hours (bool = None): bool. If true, order will be eligible to
+                    execute in premarket/afterhours.
+                order_class (str = None): simple, bracket, oco or oto
+                take_profit (dict = None): dict with field "limit_price" e.g
                     {"limit_price": "298.95"}
-                stop_loss: dict with fields "stop_price" and "limit_price" e.g
-                    {"stop_price": "297.95", "limit_price": "298.95"}
-                trail_price: str of float
-                trail_percent: str of float
+                stop_loss (dict = None): dict with fields "stop_price" and "limit_price"
+                    e.g {"stop_price": "297.95", "limit_price": "298.95"}
+                trail_price (str = None): str of float
+                trail_percent (str = None): str of float
 
         Returns:
             Dict: a dictionary containing order information
@@ -60,18 +60,42 @@ class AlpacaApi(BaseApi):
         # Initialize default kwargs if necessary
         if "time_in_force" not in kwargs:
             time_in_force = "day"
+        else:
+            time_in_force = kwargs["time_in_force"]
         if "extended_hours" not in kwargs:
             extended_hours = None
+        else:
+            extended_hours = kwargs["extended_hours"]
         if "order_class" not in kwargs:
             order_class = None
+        else:
+            order_class = kwargs["order_class"]
         if "take_profit" not in kwargs:
             take_profit = None
+        else:
+            take_profit = kwargs["take_profit"]
         if "stop_loss" not in kwargs:
             stop_loss = None
+        else:
+            stop_loss = kwargs["stop_loss"]
         if "trail_price" not in kwargs:
             trail_price = None
+        else:
+            trail_price = kwargs["trail_price"]
         if "trail_percent" not in kwargs:
             trail_percent = None
+        else:
+            trail_percent = kwargs["trail_percent"]
+
+        # Special formatting
+        if limit_price is not None:
+            limit_price_adj: Union[str, None] = str(limit_price)
+        else:
+            limit_price_adj = None
+        if stop_price is not None:
+            stop_price_adj: Union[str, None] = str(stop_price)
+        else:
+            stop_price_adj = None
 
         # Submit order
         order = self.api.submit_order(
@@ -79,9 +103,10 @@ class AlpacaApi(BaseApi):
             qty=qty,
             side=side,
             type=type,
+            limit_price=limit_price_adj,
+            stop_price=stop_price_adj,
+            # kwargs
             time_in_force=time_in_force,
-            limit_price=limit_price,
-            stop_price=stop_price,
             extended_hours=extended_hours,
             order_class=order_class,
             take_profit=take_profit,
@@ -97,8 +122,8 @@ class AlpacaApi(BaseApi):
 
         Args:
             **kwargs: Arbitrary keyword arguments, among them the following:
-                status: open, closed or all. Defaults to open.
-                limit: Defaults to 50 and max is 500
+                status (str = "open"): open, closed or all. Defaults to open.
+                limit (int = 50): Defaults to 50 and max is 500
                 after: timestamp
                 until: timestamp
                 direction: asc or desc
@@ -108,15 +133,25 @@ class AlpacaApi(BaseApi):
         """
         # Initialize default kwargs if necessary
         if "status" not in kwargs:
-            status = None
+            status = "open"
+        else:
+            status = kwargs["status"]
         if "limit" not in kwargs:
-            limit = None
+            limit = 50
+        else:
+            limit = kwargs["limit"]
         if "after" not in kwargs:
             after = None
+        else:
+            after = kwargs["after"]
         if "until" not in kwargs:
             until = None
+        else:
+            until = kwargs["until"]
         if "direction" not in kwargs:
             direction = None
+        else:
+            direction = kwargs["direction"]
 
         order_list = self.api.list_orders(
             status=status, limit=limit, after=after, until=until, direction=direction
@@ -131,13 +166,15 @@ class AlpacaApi(BaseApi):
         order_dict = order.__dict__["_raw"]
         return order_dict
 
-    def cancel_order(self, order_id: str, **kwargs: Any) -> None:
+    def cancel_order(self, order_id: str, **kwargs: Any) -> Dict:
         """Cancel an order with specific order_id."""
         self.api.cancel_order(order_id=order_id)
+        return {}  # Dummy return statement since alpaca does not return anything
 
-    def cancel_all_orders(self, **kwargs: Any) -> None:
+    def cancel_all_orders(self, **kwargs: Any) -> List[Dict]:
         """Cancel all orders."""
         self.api.cancel_all_orders()
+        return [{}]  # Dummy return statement since alpaca does not return anything
 
     def list_positions(self, **kwargs: Any) -> List[Dict]:
         """Get a list of open positions."""

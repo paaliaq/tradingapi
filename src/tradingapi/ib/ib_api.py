@@ -1,8 +1,8 @@
 """Base class for trading APIs."""
-from typing import Dict, List
-import ib_insync as ibin
 import collections
+from typing import Any, Dict, List
 
+import ib_insync as ibin
 from tradingapi.base.base_api import BaseApi
 
 
@@ -22,7 +22,7 @@ class IbApi(BaseApi):
         self.ib = ibin.ib.IB()
         self.ib.connect("127.0.0.1", 4002, clientId=13)  # Ports
 
-    def get_account(self) -> Dict:
+    def get_account(self, **kwargs: Any) -> Dict:
         """Get the accounts associated with login."""
         accounts_summaries = self.ib.accountSummary()
 
@@ -40,10 +40,9 @@ class IbApi(BaseApi):
     def submit_order(
         self,
         symbol: str,
-        qty: float,
+        qty: int,
         side: str,
         type: str,
-        currency: str,
         limit_price: float = None,
         stop_price: float = None,
         **kwargs: Any
@@ -52,12 +51,14 @@ class IbApi(BaseApi):
 
         Args:
             symbol: str, Selected asset for trade
-            qty: float, quantity bought or sold.
+            qty: int, quantity bought or sold.
             side: str, "SELL" or "BUY", direction.
             type: str, Can be one of "MKT" (Market), "LMT" (Limit),
                 "STP" (Stop) or "STP_LIMIT" (stop limit).
             limit_price: the limit price
             stop_price: the stop price
+            **kwargs: Arbitrary keyword arguments, among them for instance:
+                currency (str = "USD"): the currency in which to place the order
 
         Returns:
             Dict: A list containing the order, based of trade object.
@@ -65,6 +66,8 @@ class IbApi(BaseApi):
         # Initialize default kwargs if necessary
         if "currency" not in kwargs:
             currency = "USD"
+        else:
+            currency = kwargs["currency"]
 
         # Define order according to dict
         order_dict = {

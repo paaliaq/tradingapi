@@ -2,7 +2,7 @@
 import os
 from abc import ABC, abstractmethod
 from collections import OrderedDict
-from typing import Dict, List
+from typing import Any, Dict, List
 
 
 class BaseApi(ABC):
@@ -36,7 +36,7 @@ class BaseApi(ABC):
     def submit_order(
         self,
         symbol: str,
-        qty: float,
+        qty: int,
         side: str,
         type: str,
         limit_price: float = None,
@@ -47,7 +47,7 @@ class BaseApi(ABC):
 
         Args:
             symbol: symbol or asset ID
-            qty: int
+            qty: quantity of shares
             side: buy or sell
             type: market, limit, stop, stop_limit
             limit_price: the limit price
