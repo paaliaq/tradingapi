@@ -54,9 +54,9 @@ class AlpacaApi(BaseApi):
 
         Args:
             symbol: symbol or asset ID
-            qty: int
-            side: "SELL" or "BUY"
-            type: can be one of "MKT" (Market), "LMT" (Limit),
+            qty: quantity of shares to be bought or sold
+            side: order side, can be "SELL" or "BUY"
+            type: order type, can be one of "MKT" (Market), "LMT" (Limit),
                 "STP" (Stop) or "STP_LIMIT" (stop limit)
             limit_price: the limit price
             stop_price: the stop price

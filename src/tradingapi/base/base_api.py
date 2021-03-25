@@ -47,9 +47,10 @@ class BaseApi(ABC):
 
         Args:
             symbol: symbol or asset ID
-            qty: quantity of shares
-            side: buy or sell
-            type: market, limit, stop, stop_limit
+            qty: quantity of shares to be bought or sold
+            side: order side, can be "SELL" or "BUY"
+            type: order type, can be one of "MKT" (Market), "LMT" (Limit),
+                "STP" (Stop) or "STP_LIMIT" (stop limit)
             limit_price: the limit price
             stop_price: the stop price
             **kwargs: Arbitrary keyword arguments.

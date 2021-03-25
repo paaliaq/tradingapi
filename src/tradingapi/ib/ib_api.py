@@ -50,11 +50,11 @@ class IbApi(BaseApi):
         """Create and submit an order.
 
         Args:
-            symbol: str, Selected asset for trade
-            qty: int, quantity bought or sold.
-            side: str, "SELL" or "BUY", direction.
-            type: str, Can be one of "MKT" (Market), "LMT" (Limit),
-                "STP" (Stop) or "STP_LIMIT" (stop limit).
+            symbol: symbol or asset ID
+            qty: quantity of shares to be bought or sold
+            side: order side, can be "SELL" or "BUY"
+            type: order type, can be one of "MKT" (Market), "LMT" (Limit),
+                "STP" (Stop) or "STP_LIMIT" (stop limit)
             limit_price: the limit price
             stop_price: the stop price
             **kwargs: Arbitrary keyword arguments, among them for instance:
