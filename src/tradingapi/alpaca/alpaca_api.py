@@ -23,6 +23,23 @@ class AlpacaApi(BaseApi):
         account_dict = account.__dict__["_raw"]
         return account_dict
 
+    def _handle_kwargs_submit_order(self, **kwargs: Any) -> Dict:
+        """Function to initialize missing kwargs for submit_order function."""
+        # Initialize default kwargs if necessary
+        if "time_in_force" not in kwargs:
+            kwargs["time_in_force"] = "day"
+        if "extended_hours" not in kwargs:
+            kwargs["extended_hours"] = None
+        if "take_profit" not in kwargs:
+            kwargs["take_profit"] = None
+        if "stop_loss" not in kwargs:
+            kwargs["stop_loss"] = None
+        if "trail_price" not in kwargs:
+            kwargs["trail_price"] = None
+        if "trail_percent" not in kwargs:
+            kwargs["trail_percent"] = None
+        return kwargs
+
     def submit_order(
         self,
         symbol: str,
@@ -38,15 +55,15 @@ class AlpacaApi(BaseApi):
         Args:
             symbol: symbol or asset ID
             qty: int
-            side: buy or sell
-            type: market, limit, stop, stop_limit or trailing_stop
+            side: "SELL" or "BUY"
+            type: can be one of "MKT" (Market), "LMT" (Limit),
+                "STP" (Stop) or "STP_LIMIT" (stop limit)
             limit_price: the limit price
             stop_price: the stop price
             **kwargs: Arbitrary keyword arguments, among them for instance:
                 time_in_force (str = "day"): day, gtc, opg, cls, ioc, fok
                 extended_hours (bool = None): bool. If true, order will be eligible to
                     execute in premarket/afterhours.
-                order_class (str = None): simple, bracket, oco or oto
                 take_profit (dict = None): dict with field "limit_price" e.g
                     {"limit_price": "298.95"}
                 stop_loss (dict = None): dict with fields "stop_price" and "limit_price"
@@ -57,35 +74,30 @@ class AlpacaApi(BaseApi):
         Returns:
             Dict: a dictionary containing order information
         """
-        # Initialize default kwargs if necessary
-        if "time_in_force" not in kwargs:
-            time_in_force = "day"
-        else:
-            time_in_force = kwargs["time_in_force"]
-        if "extended_hours" not in kwargs:
-            extended_hours = None
-        else:
-            extended_hours = kwargs["extended_hours"]
-        if "order_class" not in kwargs:
-            order_class = None
-        else:
-            order_class = kwargs["order_class"]
-        if "take_profit" not in kwargs:
-            take_profit = None
-        else:
-            take_profit = kwargs["take_profit"]
-        if "stop_loss" not in kwargs:
-            stop_loss = None
-        else:
-            stop_loss = kwargs["stop_loss"]
-        if "trail_price" not in kwargs:
-            trail_price = None
-        else:
-            trail_price = kwargs["trail_price"]
-        if "trail_percent" not in kwargs:
-            trail_percent = None
-        else:
-            trail_percent = kwargs["trail_percent"]
+        # Handle kwargs
+        kwargs = self._handle_kwargs_submit_order(**kwargs)
+
+        # Checking categorical input arguments
+        valid_side = {"BUY": "buy", "SELL": "sell"}
+        if side not in valid_side:
+            raise ValueError("'side' needs to be in {}".format(valid_side))
+        valid_type = {
+            "MKT": "market",
+            "LMT": "limit",
+            "STP": "stop",
+            "STP_LIMIT": "stop_limit",
+        }
+        if type not in valid_type:
+            raise ValueError("'type' needs to be in {}".format(valid_type.keys()))
+        valid_time_in_force = {"day", "gtc", "opg", "cls", "ioc", "fok"}
+        if kwargs["time_in_force"] not in valid_time_in_force:
+            raise ValueError(
+                "'time_in_force' needs to be in {}".format(valid_time_in_force)
+            )
+
+        # Mapping arguments
+        side = valid_side[side]
+        type = valid_type[type]
 
         # Special formatting
         if limit_price is not None:
@@ -106,13 +118,12 @@ class AlpacaApi(BaseApi):
             limit_price=limit_price_adj,
             stop_price=stop_price_adj,
             # kwargs
-            time_in_force=time_in_force,
-            extended_hours=extended_hours,
-            order_class=order_class,
-            take_profit=take_profit,
-            stop_loss=stop_loss,
-            trail_price=trail_price,
-            trail_percent=trail_percent,
+            time_in_force=kwargs["time_in_force"],
+            extended_hours=kwargs["extended_hours"],
+            take_profit=kwargs["take_profit"],
+            stop_loss=kwargs["stop_loss"],
+            trail_price=kwargs["trail_price"],
+            trail_percent=kwargs["trail_percent"],
         )
         order_dict = order.__dict__["_raw"]
         return order_dict
