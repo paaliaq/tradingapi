@@ -1,16 +1,17 @@
 # tradingapi
 
 This repo defines classes for placing trades through various trading apis, among others
-Alpaca and IG.
+Alpaca and Interactive brokers.
 
 ## Project Organization
 
 ```
-├── notebooks               <- Notebooks named like `YYYYMMDD-filename.ipynb`
-├── src                     <- Package of this project
-│   ├── base                <- Subpackage defining the contract with all trading APIs
-│   ├── alpaca              <- Subpackage for Alpaca trading API
-│   └── ig                  <- Subpackage for IG trading API
+├── notebooks               <- Notebooks used for demo purposes
+├── src                     <- Source for project
+│    └──┰── tradingapi      <- Package of this project
+│       ├── base            <- Subpackage defining the contract with all trading APIs
+│       ├── alpaca          <- Subpackage for Alpaca trading API
+│       └── ig              <- Subpackage for Interactive broker trading API
 ├── tests                   <- Unit tests for src/
 ├── .config                 <- All config.json files belong in this folder
 ├── README.md               <- The top-level README for developers using this project
