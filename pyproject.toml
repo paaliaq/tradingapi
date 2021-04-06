@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "tradingapi"
-version = "0.7.0"
-description = ""
+version = "0.8.0"
+description = "This repo defines classes for placing trades through various trading apis, among others Alpaca and Interactive brokers."
 authors = ["August Andersen", "Julius Kittler"]
 
 [tool.poetry.dependencies]
