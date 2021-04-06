@@ -24,5 +24,5 @@ Alpaca and IG.
 The pipeline (`.gitlab-ci.yml`) also contains some checks to ensure code quality. You can run these checks locally with the following commands from the main directory. You can also run the commands separately if that's what you prefer.
 
 ```shell
-black --check src/ && flake8 src/ && mypy src/ && pydocstyle src/ && darglint src/
+poetry run black --check src/ && flake8 src/ && mypy src/ && pydocstyle src/ && darglint src/
 ```
