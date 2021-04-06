@@ -3,7 +3,7 @@ import collections
 from typing import Any, Dict, List
 
 import ib_insync as ibin
-from tradingapi.base.base_api import BaseApi
+from src.tradingapi.base.base_api import BaseApi
 
 
 class IbApi(BaseApi):

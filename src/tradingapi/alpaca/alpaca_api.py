@@ -2,7 +2,7 @@
 from typing import Any, Dict, List, Union
 
 import alpaca_trade_api as tradeapi
-from tradingapi.base.base_api import BaseApi
+from src.tradingapi.base.base_api import BaseApi
 
 
 class AlpacaApi(BaseApi):
