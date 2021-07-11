@@ -100,7 +100,7 @@ class IbApi(BaseApi):
         contract = ibin.Stock(symbol=symbol, exchange="SMART", currency=currency)
 
         # Place order, send request
-        trade = self.ib.placeOrder(contract=contract, order=order).__dict__
+        trade = self.ib.placeOrder(contract=contract, order=order)
 
         # Confirm submission
         self.ib.sleep(2)
