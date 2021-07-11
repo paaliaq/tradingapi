@@ -4,7 +4,7 @@
 from typing import Optional
 
 
-class TradingApiException(Exception):
+class TradingApiError(Exception):
     """Exception raised for general errors while communication with APIs.
 
     Attributes:
@@ -21,7 +21,7 @@ class TradingApiException(Exception):
         super().__init__(self.message)
 
 
-class TradingApiHttpException(Exception):
+class TradingApiHttpError(Exception):
     """Exception raised for HTTP errors while communication with APIs."""
 
     def __init__(
