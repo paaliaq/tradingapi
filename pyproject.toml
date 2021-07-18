@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tradingapi"
-version = "0.8.3"
+version = "0.8.5"
 description = ""
 authors = ["August Andersen", "Julius Kittler"]
 
