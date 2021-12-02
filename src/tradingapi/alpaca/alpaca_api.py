@@ -1,7 +1,18 @@
 """Base class for trading APIs."""
-from typing import Any, Dict, List, Union
+from datetime import datetime
+from typing import Any, Dict, List
 
 import alpaca_trade_api as tradeapi
+from alpaca_trade_api.rest import Orders
+from domainmodels.account import DomainAccount
+from domainmodels.clock import DomainClock
+from domainmodels.order import DomainOrder
+from domainmodels.trading_day import TradingDay
+from helpers.async_wrapper import async_wrap
+from mappers.account_mapper import AccountMapper
+from mappers.clock_mapper import ClockMapper
+from mappers.order_mapper import OrderMapper
+from mappers.tradingday_mapper import TradingDayMapper
 from tradingapi.base.base_api import BaseApi
 
 
@@ -17,11 +28,17 @@ class AlpacaApi(BaseApi):
         super().__init__(env_dict)  # type: ignore
         self.api = tradeapi.REST()
 
-    def get_account(self, **kwargs: Any) -> Dict:
+    async def get_account(self) -> DomainAccount:
         """Get the account."""
-        account = self.api.get_account()
-        account_dict = account.__dict__["_raw"]
-        return account_dict
+        # Get Account
+        get_account_async = async_wrap(self.api.get_account)
+        account = await get_account_async()
+
+        # Mapping
+        account_mapper = AccountMapper()
+        domain_account = account_mapper.map(account)
+
+        return domain_account
 
     def _handle_kwargs_submit_order(self, **kwargs: Any) -> Dict:
         """Function to initialize missing kwargs for submit_order function."""
@@ -40,93 +57,72 @@ class AlpacaApi(BaseApi):
             kwargs["trail_percent"] = None
         return kwargs
 
-    def submit_order(
+    async def get_clock(self) -> DomainClock:
+        """Returns the clock."""
+        # Get clock
+        get_clock_async = async_wrap(self.api.get_clock)
+        clock = await get_clock_async()
+
+        # Mapping
+        clock_mapper = ClockMapper()
+        domain_clock = clock_mapper.map(clock)
+
+        return domain_clock
+
+    async def get_trading_days(
+        self, start: datetime, end: datetime
+    ) -> List[TradingDay]:
+        """Function to get calendars."""
+        get_calendar_async = async_wrap(self.api.get_calendar)
+
+        calendars = await get_calendar_async(start.isoformat(), end.isoformat())
+
+        # Mapping
+        trading_day_mapper = TradingDayMapper()
+        domains_trading_days = [trading_day_mapper(c) for c in calendars]
+
+        return domains_trading_days
+
+    async def submit_order(
         self,
-        symbol: str,
-        qty: int,
-        side: str,
-        type: str,
-        limit_price: float = None,
-        stop_price: float = None,
-        **kwargs: Any
-    ) -> Dict:
+        order: Orders,
+    ) -> DomainOrder:
         """Submit an order.
 
         Args:
-            symbol: symbol or asset ID
-            qty: quantity of shares to be bought or sold
-            side: order side, can be "SELL" or "BUY"
-            type: order type, can be one of "MKT" (Market), "LMT" (Limit),
-                "STP" (Stop) or "STP_LIMIT" (stop limit)
-            limit_price: the limit price
-            stop_price: the stop price
-            **kwargs: Arbitrary keyword arguments, among them for instance:
-                time_in_force (str = "day"): day, gtc, opg, cls, ioc, fok
-                extended_hours (bool = None): bool. If true, order will be eligible to
-                    execute in premarket/afterhours.
-                take_profit (dict = None): dict with field "limit_price" e.g
-                    {"limit_price": "298.95"}
-                stop_loss (dict = None): dict with fields "stop_price" and "limit_price"
-                    e.g {"stop_price": "297.95", "limit_price": "298.95"}
-                trail_price (str = None): str of float
-                trail_percent (str = None): str of float
+            order: The order to submit
 
         Returns:
-            Dict: a dictionary containing order information
+            DomainOrder: The places order
         """
-        # Handle kwargs
-        kwargs = self._handle_kwargs_submit_order(**kwargs)
+        # We do no mapping here, as the sdk directly takes all of the values
 
-        # Checking categorical input arguments
-        valid_side = {"BUY": "buy", "SELL": "sell"}
-        if side not in valid_side:
-            raise ValueError("'side' needs to be in {}".format(valid_side))
-        valid_type = {
-            "MKT": "market",
-            "LMT": "limit",
-            "STP": "stop",
-            "STP_LIMIT": "stop_limit",
-        }
-        if type not in valid_type:
-            raise ValueError("'type' needs to be in {}".format(valid_type.keys()))
-        valid_time_in_force = {"day", "gtc", "opg", "cls", "ioc", "fok"}
-        if kwargs["time_in_force"] not in valid_time_in_force:
-            raise ValueError(
-                "'time_in_force' needs to be in {}".format(valid_time_in_force)
-            )
-
-        # Mapping arguments
-        side = valid_side[side]
-        type = valid_type[type]
-
-        # Special formatting
-        if limit_price is not None:
-            limit_price_adj: Union[str, None] = str(limit_price)
-        else:
-            limit_price_adj = None
-        if stop_price is not None:
-            stop_price_adj: Union[str, None] = str(stop_price)
-        else:
-            stop_price_adj = None
+        # Get Account
+        submit_order_async = async_wrap(self.api.submit_order)
 
         # Submit order
-        order = self.api.submit_order(
-            symbol=symbol,
-            qty=qty,
-            side=side,
-            type=type,
-            limit_price=limit_price_adj,
-            stop_price=stop_price_adj,
-            # kwargs
-            time_in_force=kwargs["time_in_force"],
-            extended_hours=kwargs["extended_hours"],
-            take_profit=kwargs["take_profit"],
-            stop_loss=kwargs["stop_loss"],
-            trail_price=kwargs["trail_price"],
-            trail_percent=kwargs["trail_percent"],
+        order = await submit_order_async(
+            symbol=order.symbol,
+            qty=order.qty,
+            side=order.side.value,
+            type=order.type.value,
+            limit_price=order.limit_price,
+            stop_price=order.stop_price,
+            time_in_force=order.time_in_force.value,
+            extended_hours=order.extended_hours,
+            take_profit=order.take_profit,
+            stop_loss=order.stop_loss,
+            trail_price=order.trail_price,
+            trail_percent=order.trail_percent,
+            order_class=order.order_class.value,
+            instructions=None,  # not documented in alpaca?
         )
-        order_dict = order.__dict__["_raw"]
-        return order_dict
+
+        # Mapping
+        order_mapper = OrderMapper()
+        domain_order = order_mapper.map(order)
+
+        return domain_order
 
     def list_orders(self, **kwargs: Any) -> List[Dict]:
         """List orders.

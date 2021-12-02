@@ -2,7 +2,13 @@
 import os
 from abc import ABC, abstractmethod
 from collections import OrderedDict
+from datetime import datetime
 from typing import Any, Dict, List
+
+from domainmodels.account import DomainAccount
+from domainmodels.clock import DomainClock
+from domainmodels.order import DomainOrder
+from domainmodels.trading_day import TradingDay
 
 
 class BaseApi(ABC):
@@ -28,32 +34,26 @@ class BaseApi(ABC):
             os.environ[k] = v
 
     @abstractmethod
-    def get_account(self, **kwargs: Any) -> Dict:
+    async def get_account(self) -> DomainAccount:
         """Get the account."""
         pass
 
     @abstractmethod
-    def submit_order(
-        self,
-        symbol: str,
-        qty: int,
-        side: str,
-        type: str,
-        limit_price: float = None,
-        stop_price: float = None,
-        **kwargs: Any
-    ) -> Dict:
+    async def get_clock(self) -> DomainClock:
+        """Get the clock."""
+        pass
+
+    @abstractmethod
+    async def get_calendars(self, start: datetime, end: datetime) -> List[TradingDay]:
+        """Get the calendars."""
+        pass
+
+    @abstractmethod
+    async def submit_order(self, order: DomainOrder) -> DomainOrder:
         """Submit an order.
 
         Args:
-            symbol: symbol or asset ID
-            qty: quantity of shares to be bought or sold
-            side: order side, can be "SELL" or "BUY"
-            type: order type, can be one of "MKT" (Market), "LMT" (Limit),
-                "STP" (Stop) or "STP_LIMIT" (stop limit)
-            limit_price: the limit price
-            stop_price: the stop price
-            **kwargs: Arbitrary keyword arguments.
+            order: The order to submit
         """
         pass
 
