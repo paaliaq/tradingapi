@@ -1,5 +1,5 @@
 """Mapper."""
-import datetime
+from datetime import datetime
 
 from alpaca_trade_api.entity import Calendar
 from domainmodels.trading_day import TradingDay
