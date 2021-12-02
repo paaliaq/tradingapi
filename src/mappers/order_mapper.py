@@ -1,3 +1,4 @@
+"""A mapper maps all day."""
 from alpaca_trade_api.entity import Order
 from domainmodels.order import (
     DomainOrder,
@@ -14,9 +15,10 @@ from mappers.mapper import Mapper
 
 
 class OrderMapper(Mapper[Order, DomainOrder]):
-    def map(self, order: Order) -> DomainOrder:
+    """Mapper to map from Order to DomainOrder."""
 
-        # Order
+    def map(self, order: Order) -> DomainOrder:
+        """Function to map from Order to DomainOrder."""  # Order
         domain_order = DomainOrder(order.symbol)
 
         domain_order.id = order.client_order_id

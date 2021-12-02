@@ -1,8 +1,11 @@
+"""The account."""
 from datetime import datetime
 from uuid import UUID
 
 
 class DomainAccount:
+    """An account."""
+
     id: UUID
     account_number: str
     account_blocked: bool

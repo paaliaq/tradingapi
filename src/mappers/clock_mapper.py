@@ -1,3 +1,4 @@
+"""Mapper."""
 from alpaca_trade_api.entity import Clock
 from domainmodels.clock import DomainClock
 
@@ -5,8 +6,12 @@ from mappers.mapper import Mapper
 
 
 class ClockMapper(Mapper[Clock, DomainClock]):
-    def map(self, clock: Clock) -> DomainClock:
+    """Mapper to map from Clock to DomainClock."""
 
+    """Mapper."""
+
+    def map(self, clock: Clock) -> DomainClock:
+        """Function to map from Clock to DomainClock."""
         # Clock
         domain_clock = DomainClock()
 

@@ -1,3 +1,4 @@
+"""Mapper."""
 import datetime
 
 from alpaca_trade_api.entity import Calendar
@@ -7,8 +8,10 @@ from mappers.mapper import Mapper
 
 
 class TradingDayMapper(Mapper[Calendar, TradingDay]):
-    def map(self, calendar: Calendar) -> TradingDay:
+    """Mapper to map from Calendar to TradingDay."""
 
+    def map(self, calendar: Calendar) -> TradingDay:
+        """Function to map from Calendar to TradingDay."""
         # Calendar
         trading_day = TradingDay()
         trading_day.open = datetime.combine(

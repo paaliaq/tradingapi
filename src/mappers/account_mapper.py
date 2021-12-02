@@ -1,3 +1,4 @@
+"""Account mapper."""
 from alpaca_trade_api.entity import Account
 from domainmodels.account import DomainAccount
 
@@ -5,8 +6,10 @@ from mappers.mapper import Mapper
 
 
 class AccountMapper(Mapper[Account, DomainAccount]):
-    def map(self, account: Account) -> DomainAccount:
+    """Mapper to map from Account to DomainAccount."""
 
+    def map(self, account: Account) -> DomainAccount:
+        """Function to map from Account to DomainAccount."""
         # Account
         domain_account = DomainAccount()
 

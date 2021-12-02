@@ -1,4 +1,4 @@
-""""""
+"""Mapper."""
 from abc import abstractmethod
 from typing import Generic, TypeVar
 
@@ -14,8 +14,10 @@ class Mapper(Generic[Tin, Tout]):
     """
 
     def __init__(self) -> None:
+        """Class initialization function."""
         pass
 
     @abstractmethod
     def map(self, obj_a: Tin) -> Tout:
+        """Function to map from a to b."""
         pass

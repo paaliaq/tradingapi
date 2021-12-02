@@ -3,10 +3,9 @@ import collections
 from typing import Any, Dict, List
 
 import ib_insync as ibin
-from tradingapi.base.base_api import BaseApi
 
 
-class IbApi(BaseApi):
+class IbApi:
     """Class for interactive broker API.
 
     This class use the package ib-insync for making asynchronous requests toward
