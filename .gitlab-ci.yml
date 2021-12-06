@@ -6,6 +6,7 @@ stages:
 
 application-lint:
   stage: lint
+  script:
     - pip install poetry==1.1.11
     - poetry install
     - poetry run black --check src/
