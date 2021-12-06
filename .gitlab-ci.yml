@@ -2,38 +2,17 @@ image: python:3.8
 
 stages:
   - lint
-  - test
   - publish
 
-application-lint-black:
+application-lint:
   stage: lint
-  script:
-    - pip install black
-    - black --check src/
-
-application-lint-flake8:
-  stage: lint
-  script:
-    - pip install flake8 pep8-naming
-    - flake8 src/
-
-application-lint-mypy:
-  stage: lint
-  script:
-    - pip install mypy
-    - mypy src/
-
-application-lint-pydocstyle:
-  stage: lint
-  script:
-    - pip install pydocstyle
-    - pydocstyle src/
-
-application-lint-darglint:
-  stage: lint
-  script:
-    - pip install darglint
-    - darglint src/
+    - pip install poetry==1.1.11
+    - poetry install
+    - poetry run black --check src/
+    - poetry run flake8 src/
+    - poetry run mypy src/
+    - poetry run pydocstyle src/
+    - poetry run darglint src/
 
 application-publish:
   stage: publish

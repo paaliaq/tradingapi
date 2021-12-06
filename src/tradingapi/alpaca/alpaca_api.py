@@ -1,12 +1,19 @@
 """Base class for trading APIs."""
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import alpaca_trade_api as tradeapi
-from alpaca_trade_api.rest import Orders
 from domainmodels.account import DomainAccount
 from domainmodels.clock import DomainClock
-from domainmodels.order import DomainOrder
+from domainmodels.order import (
+    DomainOrder,
+    OrderClass,
+    Side,
+    StopLoss,
+    TakeProfit,
+    TimeInForce,
+    Type,
+)
 from domainmodels.trading_day import TradingDay
 from helpers.async_wrapper import async_wrap
 from mappers.account_mapper import AccountMapper
@@ -75,22 +82,50 @@ class AlpacaApi(BaseApi):
         """Function to get calendars."""
         get_calendar_async = async_wrap(self.api.get_calendar)
 
-        calendars = await get_calendar_async(start.isoformat(), end.isoformat())
+        calendars = await get_calendar_async(
+            start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
+        )
 
         # Mapping
         trading_day_mapper = TradingDayMapper()
-        domains_trading_days = [trading_day_mapper(c) for c in calendars]
+        domains_trading_days = [trading_day_mapper.map(c) for c in calendars]
 
         return domains_trading_days
 
     async def submit_order(
         self,
-        order: Orders,
+        symbol: str,
+        qty: int,
+        side: Side,
+        type: Type = Type.MARKET,
+        time_in_force: TimeInForce = TimeInForce.DAY,
+        extended_hours: bool = False,
+        order_class: OrderClass = OrderClass.SIMPLE,
+        stop_price: Optional[float] = None,
+        limit_price: Optional[float] = None,
+        take_profit: Optional[TakeProfit] = None,
+        stop_loss: Optional[StopLoss] = None,
+        trail_price: Optional[float] = None,
+        trail_percent: Optional[float] = None,
+        notional: Optional[float] = None,
     ) -> DomainOrder:
         """Submit an order.
 
         Args:
-            order: The order to submit
+            symbol: str,
+            qty: int,
+            side: Side,
+            type: Type = Type.MARKET,
+            time_in_force: TimeInForce = TimeInForce.DAY,
+            extended_hours: bool = False,
+            order_class: OrderClass = OrderClass.SIMPLE,
+            stop_price: Optional[float] = None,
+            limit_price: Optional[float] = None,
+            take_profit: Optional[TakeProfit] = None,
+            stop_loss: Optional[StopLoss] = None,
+            trail_price: Optional[float] = None,
+            trail_percent: Optional[float] = None,
+            notional: Optional[float] = None,
 
         Returns:
             DomainOrder: The places order
@@ -102,19 +137,19 @@ class AlpacaApi(BaseApi):
 
         # Submit order
         order = await submit_order_async(
-            symbol=order.symbol,
-            qty=order.qty,
-            side=order.side.value,
-            type=order.type.value,
-            limit_price=order.limit_price,
-            stop_price=order.stop_price,
-            time_in_force=order.time_in_force.value,
-            extended_hours=order.extended_hours,
-            take_profit=order.take_profit,
-            stop_loss=order.stop_loss,
-            trail_price=order.trail_price,
-            trail_percent=order.trail_percent,
-            order_class=order.order_class.value,
+            symbol=symbol,
+            qty=qty,
+            side=side.value,
+            type=type.value,
+            limit_price=limit_price,
+            stop_price=stop_price,
+            time_in_force=time_in_force.value,
+            extended_hours=extended_hours,
+            order_class=order_class.value,
+            take_profit=None if take_profit is None else take_profit,
+            stop_loss=None if stop_loss is None else stop_loss,
+            trail_price=trail_price,
+            trail_percent=trail_percent,
             instructions=None,  # not documented in alpaca?
         )
 

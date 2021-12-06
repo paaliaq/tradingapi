@@ -3,11 +3,19 @@ import os
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from domainmodels.account import DomainAccount
 from domainmodels.clock import DomainClock
-from domainmodels.order import DomainOrder
+from domainmodels.order import (
+    DomainOrder,
+    OrderClass,
+    Side,
+    StopLoss,
+    TakeProfit,
+    TimeInForce,
+    Type,
+)
 from domainmodels.trading_day import TradingDay
 
 
@@ -44,16 +52,47 @@ class BaseApi(ABC):
         pass
 
     @abstractmethod
-    async def get_calendars(self, start: datetime, end: datetime) -> List[TradingDay]:
+    async def get_trading_days(
+        self, start: datetime, end: datetime
+    ) -> List[TradingDay]:
         """Get the calendars."""
         pass
 
     @abstractmethod
-    async def submit_order(self, order: DomainOrder) -> DomainOrder:
+    async def submit_order(
+        self,
+        symbol: str,
+        qty: int,
+        side: Side,
+        type: Type = Type.MARKET,
+        time_in_force: TimeInForce = TimeInForce.DAY,
+        extended_hours: bool = False,
+        order_class: OrderClass = OrderClass.SIMPLE,
+        stop_price: Optional[float] = None,
+        limit_price: Optional[float] = None,
+        take_profit: Optional[TakeProfit] = None,
+        stop_loss: Optional[StopLoss] = None,
+        trail_price: Optional[float] = None,
+        trail_percent: Optional[float] = None,
+        notional: Optional[float] = None,
+    ) -> DomainOrder:
         """Submit an order.
 
         Args:
-            order: The order to submit
+            symbol: str,
+            qty: int,
+            side: Side,
+            type: Type = Type.MARKET,
+            time_in_force: TimeInForce = TimeInForce.DAY,
+            extended_hours: bool = False,
+            order_class: OrderClass = OrderClass.SIMPLE,
+            stop_price: Optional[float] = None,
+            limit_price: Optional[float] = None,
+            take_profit: Optional[TakeProfit] = None,
+            stop_loss: Optional[StopLoss] = None,
+            trail_price: Optional[float] = None,
+            trail_percent: Optional[float] = None,
+            notional: Optional[float] = None,
         """
         pass
 

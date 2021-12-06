@@ -1,6 +1,19 @@
 """The account."""
 from datetime import datetime
+from enum import Enum
 from uuid import UUID
+
+
+class Status(str, Enum):
+    """The type of the order."""
+
+    ONBOARDING = "ONBOARDING"
+    SUBMISSION_FAILED = "SUBMISSION_FAILED"
+    SUBMITTED = "SUBMITTED"
+    ACCOUNT_UPDATED = "ACCOUNT_UPDATED"
+    APPROVAL_PENDING = "APPROVAL_PENDING"
+    ACTIVE = "ACTIVE"
+    REJECTED = "REJECTED"
 
 
 class DomainAccount:
@@ -28,7 +41,7 @@ class DomainAccount:
     short_market_value: int
     shorting_enabled: bool
     sma: int
-    status: str
+    status: Status
     trade_suspended_by_user: bool
     trading_blocked: bool
     transfers_blocked: bool

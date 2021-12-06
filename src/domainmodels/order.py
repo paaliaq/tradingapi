@@ -31,20 +31,6 @@ class TimeInForce(str, Enum):
     FILL_OR_KILL = "fok"
 
 
-class LimitPrice(str, Enum):
-    """The limit price."""
-
-    LIMIT = "limit"
-    STOP_LIMIT = "stop_limit"
-
-
-class StopPrice(str, Enum):
-    """The stop price."""
-
-    STOP = "stop"
-    STOP_LIMIT = "stop_limit"
-
-
 class OrderClass(str, Enum):
     """The order class."""
 
@@ -72,12 +58,12 @@ class DomainOrder:
 
     id: Optional[str] = None
     symbol: str
-    qty: Optional[int] = None
+    qty: int
     side: Side = Side.BUY
     type: Type = Type.MARKET
     time_in_force: TimeInForce = TimeInForce.DAY
-    limit_price: Optional[LimitPrice] = None
-    stop_price: Optional[StopPrice] = None
+    limit_price: Optional[float] = None
+    stop_price: Optional[float] = None
     extended_hours: Optional[bool] = None
     order_class: Optional[OrderClass] = None
     take_profit: Optional[TakeProfit] = None
