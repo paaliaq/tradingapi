@@ -5,20 +5,15 @@ from typing import Any, Dict, List, Optional
 import alpaca_trade_api as tradeapi
 from domainmodels.account import DomainAccount
 from domainmodels.clock import DomainClock
-from domainmodels.order import (
-    DomainOrder,
-    OrderClass,
-    Side,
-    StopLoss,
-    TakeProfit,
-    TimeInForce,
-    Type,
-)
+from domainmodels.order import (DomainOrder, OrderClass, Side, StopLoss,
+                                TakeProfit, TimeInForce, Type)
+from domainmodels.position import DomainPosition
 from domainmodels.trading_day import TradingDay
 from helpers.async_wrapper import async_wrap
 from mappers.account_mapper import AccountMapper
 from mappers.clock_mapper import ClockMapper
 from mappers.order_mapper import OrderMapper
+from mappers.position_mapper import PositionMapper
 from mappers.tradingday_mapper import TradingDayMapper
 from tradingapi.base.base_api import BaseApi
 
@@ -159,7 +154,7 @@ class AlpacaApi(BaseApi):
 
         return domain_order
 
-    def list_orders(self, **kwargs: Any) -> List[Dict]:
+    async def list_orders(self, **kwargs: Any) -> List[DomainOrder]:
         """List orders.
 
         Args:
@@ -195,49 +190,88 @@ class AlpacaApi(BaseApi):
         else:
             direction = kwargs["direction"]
 
-        order_list = self.api.list_orders(
+        # Retrieve order list
+        list_orders_async = async_wrap(self.api.list_orders)
+        order_list = await list_orders_async(
             status=status, limit=limit, after=after, until=until, direction=direction
         )
-        order_list = [order.__dict__["_raw"] for order in order_list]
 
-        return order_list
+        # Map order list to domain order list
+        order_mapper = OrderMapper()
+        domain_order_list = [order_mapper.map(order) for order in order_list]
 
-    def get_order(self, order_id: str, **kwargs: Any) -> Dict:
+        return domain_order_list
+
+    async def get_order(self, order_id: str, **kwargs: Any) -> DomainOrder:
         """Get an order with specific order_id."""
-        order = self.api.get_order(order_id=order_id)
-        order_dict = order.__dict__["_raw"]
-        return order_dict
+        # Retrieve order
+        get_order_async = async_wrap(self.api.get_order)
+        order = await get_order_async(order_id=order_id)
 
-    def cancel_order(self, order_id: str, **kwargs: Any) -> Dict:
+        # Map order to domain order
+        order_mapper = OrderMapper()
+        domain_order = order_mapper.map(order)
+
+        return domain_order
+
+    async def cancel_order(self, order_id: str, **kwargs: Any) -> None:
         """Cancel an order with specific order_id."""
-        self.api.cancel_order(order_id=order_id)
-        return {}  # Dummy return statement since alpaca does not return anything
+        cancel_order_async = async_wrap(self.api.cancel_order)
+        await cancel_order_async(order_id=order_id)
 
-    def cancel_all_orders(self, **kwargs: Any) -> List[Dict]:
+        return None
+
+    async def cancel_all_orders(self, **kwargs: Any) -> None:
         """Cancel all orders."""
-        self.api.cancel_all_orders()
-        return [{}]  # Dummy return statement since alpaca does not return anything
+        cancel_all_orders_async = async_wrap(self.api.cancel_all_orders)
+        await cancel_all_orders_async()
 
-    def list_positions(self, **kwargs: Any) -> List[Dict]:
+        return None
+
+    async def list_positions(self, **kwargs: Any) -> List[DomainPosition]:
         """Get a list of open positions."""
-        position_list = self.api.list_positions()
-        position_list = [position.__dict__["_raw"] for position in position_list]
-        return position_list
+        # Retrieve positions
+        list_positions_async = async_wrap(self.api.list_positions)
+        position_list = await list_positions_async()
 
-    def get_position(self, symbol: str, **kwargs: Any) -> Dict:
+        # Map position list to domain position list
+        position_mapper = PositionMapper()
+        domain_position_list = [position_mapper(position) for position in position_list]
+
+        return domain_position_list
+
+    async def get_position(self, symbol: str, **kwargs: Any) -> DomainPosition:
         """Get an open position for a symbol."""
-        position = self.api.get_position(symbol=symbol)
-        position_dict = position.__dict__["_raw"]
-        return position_dict
+        # Retrieve position
+        get_position_async = async_wrap(self.api.get_position)
+        position = await get_position_async(symbol=symbol)
 
-    def close_position(self, symbol: str, **kwargs: Any) -> Dict:
+        # Map position to domain position
+        position_mapper = PositionMapper()
+        domain_position = position_mapper(position)
+
+        return domain_position
+
+    async def close_position(self, symbol: str, **kwargs: Any) -> DomainPosition:
         """Liquidates the position for the given symbol at market price."""
-        position = self.api.close_position(symbol=symbol)
-        position_dict = position.__dict__["_raw"]
-        return position_dict
+        # Get closed position
+        close_position_async = async_wrap(self.api.close_position)
+        position = await close_position_async(symbol=symbol)
 
-    def close_all_positions(self, **kwargs: Any) -> List[Dict]:
+        # Map position to domain position
+        position_mapper = PositionMapper()
+        domain_position = position_mapper(position)
+
+        return domain_position
+
+    async def close_all_positions(self, **kwargs: Any) -> List[DomainPosition]:
         """Liquidates all open positions at market price."""
-        position_list = self.api.close_all_positions()
-        position_list = [position.__dict__["_raw"] for position in position_list]
-        return position_list
+        # Get list of closed positions
+        close_all_positions_async = async_wrap(self.api.close_all_positions)
+        position_list = await close_all_positions_async()
+
+        # Map position list to domain position list
+        position_mapper = PositionMapper()
+        domain_position_list = [position_mapper(position) for position in position_list]
+
+        return domain_position_list

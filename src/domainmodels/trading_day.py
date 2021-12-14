@@ -1,4 +1,4 @@
-"""Trading Day."""
+"""A trading day."""
 
 from datetime import date, datetime
 from typing import Optional

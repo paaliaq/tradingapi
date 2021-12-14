@@ -7,15 +7,9 @@ from typing import Any, Dict, List, Optional
 
 from domainmodels.account import DomainAccount
 from domainmodels.clock import DomainClock
-from domainmodels.order import (
-    DomainOrder,
-    OrderClass,
-    Side,
-    StopLoss,
-    TakeProfit,
-    TimeInForce,
-    Type,
-)
+from domainmodels.order import (DomainOrder, OrderClass, Side, StopLoss,
+                                TakeProfit, TimeInForce, Type)
+from domainmodels.position import DomainPosition
 from domainmodels.trading_day import TradingDay
 
 
@@ -97,41 +91,41 @@ class BaseApi(ABC):
         pass
 
     @abstractmethod
-    def list_orders(self, **kwargs: Any) -> List[Dict]:
+    def list_orders(self, **kwargs: Any) -> List[DomainOrder]:
         """Get a list with all orders."""
         pass
 
     @abstractmethod
-    def get_order(self, order_id: str, **kwargs: Any) -> Dict:
+    def get_order(self, order_id: str, **kwargs: Any) -> DomainOrder:
         """Get an order with specific order_id."""
         pass
 
     @abstractmethod
-    def cancel_order(self, order_id: str, **kwargs: Any) -> Dict:
+    def cancel_order(self, order_id: str, **kwargs: Any) -> None:
         """Cancel an order with specific order_id."""
         pass
 
     @abstractmethod
-    def cancel_all_orders(self, **kwargs: Any) -> List[Dict]:
+    def cancel_all_orders(self, **kwargs: Any) -> None:
         """Cancel all orders."""
         pass
 
     @abstractmethod
-    def list_positions(self, **kwargs: Any) -> List[Dict]:
+    def list_positions(self, **kwargs: Any) -> List[DomainPosition]:
         """Get a list of open positions."""
         pass
 
     @abstractmethod
-    def get_position(self, symbol: str, **kwargs: Any) -> Dict:
+    def get_position(self, symbol: str, **kwargs: Any) -> DomainPosition:
         """Get an open position for a symbol."""
         pass
 
     @abstractmethod
-    def close_position(self, symbol: str, **kwargs: Any) -> Dict:
+    def close_position(self, symbol: str, **kwargs: Any) -> DomainPosition:
         """Liquidates the position for the given symbol at market price."""
         pass
 
     @abstractmethod
-    def close_all_positions(self, **kwargs: Any) -> List[Dict]:
+    def close_all_positions(self, **kwargs: Any) -> List[DomainPosition]:
         """Liquidates all open positions at market price."""
         pass
