@@ -5,8 +5,15 @@ from typing import Any, Dict, List, Optional
 import alpaca_trade_api as tradeapi
 from domainmodels.account import DomainAccount
 from domainmodels.clock import DomainClock
-from domainmodels.order import (DomainOrder, OrderClass, Side, StopLoss,
-                                TakeProfit, TimeInForce, Type)
+from domainmodels.order import (
+    DomainOrder,
+    OrderClass,
+    Side,
+    StopLoss,
+    TakeProfit,
+    TimeInForce,
+    Type,
+)
 from domainmodels.position import DomainPosition
 from domainmodels.trading_day import TradingDay
 from helpers.async_wrapper import async_wrap

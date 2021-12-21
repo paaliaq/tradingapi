@@ -28,9 +28,6 @@ class DomainPosition:
     asset_id: str
     symbol: str
     qty: int
-    side: Side = Side.LONG
-    exchange: Exchange = Exchange.NASDAQ
-    asset_class: AssetClass = AssetClass.US_EQUITY
     asset_marginable: bool
     avg_entry_price: float
     market_value: float
@@ -42,3 +39,6 @@ class DomainPosition:
     current_price: float
     lastday_price: float
     change_today: float
+    side: Side = Side.LONG
+    exchange: Exchange = Exchange.NASDAQ
+    asset_class: AssetClass = AssetClass.US_EQUITY

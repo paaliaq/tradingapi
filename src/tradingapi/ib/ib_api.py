@@ -1,3 +1,4 @@
+# type: ignore
 """Base class for trading APIs."""
 import collections
 from typing import Any, Dict, List

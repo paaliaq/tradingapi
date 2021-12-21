@@ -9,10 +9,9 @@ class PositionMapper(Mapper[Position, DomainPosition]):
     """Mapper to map from Position to DomainPosition."""
 
     def map(self, position: Position) -> DomainPosition:
-        """Function to map from Position to DomainPosition.""" 
-
+        """Function to map from Position to DomainPosition."""
         domain_position = DomainPosition(position.symbol)
-        domain_position.asset_id = position.asset_id 
+        domain_position.asset_id = position.asset_id
         domain_position.asset_marginable = position.asset_marginable
         domain_position.qty = position.qty
         domain_position.avg_entry_price = position.avg_entry_price
