@@ -10,7 +10,7 @@ from domainmodels.clock import DomainClock
 from domainmodels.order import (
     DomainOrder,
     OrderClass,
-    Side,
+    OrderSide,
     StopLoss,
     TakeProfit,
     TimeInForce,
@@ -64,7 +64,7 @@ class BaseApi(ABC):
         self,
         symbol: str,
         qty: int,
-        side: Side,
+        side: OrderSide,
         type: Type = Type.MARKET,
         time_in_force: TimeInForce = TimeInForce.DAY,
         extended_hours: bool = False,
@@ -82,7 +82,7 @@ class BaseApi(ABC):
         Args:
             symbol: str,
             qty: int,
-            side: Side,
+            side: OrderSide,
             type: Type = Type.MARKET,
             time_in_force: TimeInForce = TimeInForce.DAY,
             extended_hours: bool = False,

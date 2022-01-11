@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional
 
 
-class Side(str, Enum):
+class OrderSide(str, Enum):
     """The side of the order."""
 
     BUY = "buy"
@@ -59,7 +59,7 @@ class DomainOrder:
     id: Optional[str] = None
     symbol: str
     qty: int
-    side: Side = Side.BUY
+    side: OrderSide = OrderSide.BUY
     type: Type = Type.MARKET
     time_in_force: TimeInForce = TimeInForce.DAY
     limit_price: Optional[float] = None

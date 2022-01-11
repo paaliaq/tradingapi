@@ -7,9 +7,10 @@ class Exchange(str, Enum):
 
     NYSE = "NYSE"
     NASDAQ = "NASDAQ"
+    UNKNOWN = "UNKNOWN"
 
 
-class Side(str, Enum):
+class PositionSide(str, Enum):
     """The side of the position."""
 
     LONG = "long"
@@ -39,6 +40,6 @@ class DomainPosition:
     current_price: float
     lastday_price: float
     change_today: float
-    side: Side = Side.LONG
+    side: PositionSide = PositionSide.LONG
     exchange: Exchange = Exchange.NASDAQ
     asset_class: AssetClass = AssetClass.US_EQUITY

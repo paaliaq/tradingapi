@@ -8,7 +8,7 @@ from domainmodels.clock import DomainClock
 from domainmodels.order import (
     DomainOrder,
     OrderClass,
-    Side,
+    OrderSide,
     StopLoss,
     TakeProfit,
     TimeInForce,
@@ -98,7 +98,7 @@ class AlpacaApi(BaseApi):
         self,
         symbol: str,
         qty: int,
-        side: Side,
+        side: OrderSide,
         type: Type = Type.MARKET,
         time_in_force: TimeInForce = TimeInForce.DAY,
         extended_hours: bool = False,
@@ -116,7 +116,7 @@ class AlpacaApi(BaseApi):
         Args:
             symbol: str,
             qty: int,
-            side: Side,
+            side: OrderSide,
             type: Type = Type.MARKET,
             time_in_force: TimeInForce = TimeInForce.DAY,
             extended_hours: bool = False,
@@ -243,7 +243,7 @@ class AlpacaApi(BaseApi):
 
         # Map position list to domain position list
         position_mapper = PositionMapper()
-        domain_position_list = [position_mapper(position) for position in position_list]
+        domain_position_list = [position_mapper.map(position) for position in position_list]
 
         return domain_position_list
 
@@ -255,7 +255,7 @@ class AlpacaApi(BaseApi):
 
         # Map position to domain position
         position_mapper = PositionMapper()
-        domain_position = position_mapper(position)
+        domain_position = position_mapper.map(position)
 
         return domain_position
 
@@ -267,7 +267,7 @@ class AlpacaApi(BaseApi):
 
         # Map position to domain position
         position_mapper = PositionMapper()
-        domain_position = position_mapper(position)
+        domain_position = position_mapper.map(position)
 
         return domain_position
 
@@ -279,6 +279,6 @@ class AlpacaApi(BaseApi):
 
         # Map position list to domain position list
         position_mapper = PositionMapper()
-        domain_position_list = [position_mapper(position) for position in position_list]
+        domain_position_list = [position_mapper.map(position) for position in position_list]
 
         return domain_position_list
