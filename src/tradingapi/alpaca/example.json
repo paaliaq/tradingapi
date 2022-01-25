@@ -1,0 +1,51 @@
+[
+
+]
+
+// close_positions-Response
+{
+    "positions": [
+        {
+            "success": true,
+            "order": mapper.map(o.body)
+        },
+        ...
+    ]
+}
+
+{   "body": {   "asset_class": "us_equity",
+                "asset_id": "b6d1aa75-5c9c-4353-a305-9e2caa1925ab",
+                "canceled_at": null,
+                "client_order_id": "aaf5ab30-bf89-4858-8d1f-94b03d4adcda",
+                "created_at": "2022-01-25T18: 56: 02.808041065Z",
+                "expired_at": null,
+                "extended_hours": false,
+                "failed_at": null,
+                "filled_at": null,
+                "filled_avg_price": null,
+                "filled_qty": "0",
+                "hwm": null,
+                "id": "6941a75c-88b4-4ddb-8a24-fe0b2d560b0c",
+                "legs": null,
+                "limit_price": null,
+                "notional": null,
+                "order_class": "",
+                "order_type": "market",
+                "qty": "1",
+                "replaced_at": null,
+                "replaced_by": null,
+                "replaces": null,
+                "side": "sell",
+                "status": "accepted",
+                "stop_price": null,
+                "submitted_at": "2022-01-25T18: 56: 02.807302636Z",
+                "symbol": "MSFT",
+                "time_in_force": "day",
+                "trail_percent": null,
+                "trail_price": null,
+                "type": "market",
+                "updated_at": "2022-01-25T18: 56: 02.808041065Z"
+    },
+    "status": 200,
+    "symbol": "MSFT"
+}

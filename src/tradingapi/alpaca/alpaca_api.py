@@ -19,6 +19,7 @@ from domainmodels.trading_day import TradingDay
 from helpers.async_wrapper import async_wrap
 from mappers.account_mapper import AccountMapper
 from mappers.clock_mapper import ClockMapper
+from mappers.closed_positions_mapper import ClosedPositionMapper
 from mappers.order_mapper import OrderMapper
 from mappers.position_mapper import PositionMapper
 from mappers.tradingday_mapper import TradingDayMapper
@@ -259,26 +260,29 @@ class AlpacaApi(BaseApi):
 
         return domain_position
 
-    async def close_position(self, symbol: str, **kwargs: Any) -> DomainPosition:
+    async def close_position(self, symbol: str, **kwargs: Any) -> DomainOrder:
         """Liquidates the position for the given symbol at market price."""
         # Get closed position
         close_position_async = async_wrap(self.api.close_position)
-        position = await close_position_async(symbol=symbol)
+        order = await close_position_async(symbol=symbol)
 
         # Map position to domain position
-        position_mapper = PositionMapper()
-        domain_position = position_mapper.map(position)
+        order_mapper = OrderMapper()
+        domain_order = order_mapper.map(order)
 
-        return domain_position
+        return domain_order
 
     async def close_all_positions(self, **kwargs: Any) -> List[DomainPosition]:
         """Liquidates all open positions at market price."""
         # Get list of closed positions
         close_all_positions_async = async_wrap(self.api.close_all_positions)
-        position_list = await close_all_positions_async()
+        closed_positions = await close_all_positions_async()
 
         # Map position list to domain position list
-        position_mapper = PositionMapper()
-        domain_position_list = [position_mapper.map(position) for position in position_list]
+        closed_position_mapper = ClosedPositionMapper()
+        domain_closed_positions_list = [closed_position_mapper.map(closed_position) for closed_position in closed_positions]
+        
+        #order_mapper = OrderMapper()
+        #domain_order_list = [order_mapper.map(order.body) for order in order_list]
 
-        return domain_position_list
+        return domain_closed_positions_list

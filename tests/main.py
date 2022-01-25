@@ -10,6 +10,7 @@ from domainmodels.order import Type as OrderType
 from domainmodels.order import DomainOrder
 from domainmodels.order import OrderSide
 from domainmodels.position import DomainPosition
+from domainmodels.closed_position import ClosedPosition
 
 print(os.getcwd())
 
@@ -86,7 +87,7 @@ async def main() -> None:
 
     # Check that list_positions works
     my_positions = await api.list_positions()
-    assert len(my_positions)>0
+    assert len(my_positions) > 0
     assert all([isinstance(position, DomainPosition) for position in my_positions])
     assert all([hasattr(position, "side") for position in my_positions])
 
@@ -96,15 +97,14 @@ async def main() -> None:
     assert hasattr(aapl_position, "side")
 
     # Check that close_position works
-    closed_aapl_position = await api.close_position(symbol="AAPL")
-    assert isinstance(closed_aapl_position, DomainPosition)
-    assert hasattr(closed_aapl_position, "side")
+    closed_aapl_order = await api.close_position(symbol="AAPL")
+    assert isinstance(closed_aapl_order, DomainOrder)
+    assert hasattr(closed_aapl_order, "side")
 
     # Check that close_all_positions works
     closed_positions = await api.close_all_positions()
-    assert len(closed_positions)>0
-    assert all([isinstance(position, DomainPosition) for position in closed_positions])
-    assert all([hasattr(position, "side") for position in closed_positions])
+    assert len(closed_positions) > 0
+    assert all([isinstance(position, ClosedPosition) for position in closed_positions])
 
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(main())
