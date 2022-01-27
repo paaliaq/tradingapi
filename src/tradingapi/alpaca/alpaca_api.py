@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 import alpaca_trade_api as tradeapi
 from domainmodels.account import DomainAccount
 from domainmodels.clock import DomainClock
+from domainmodels.closed_position import ClosedPosition
 from domainmodels.order import (
     DomainOrder,
     OrderClass,
@@ -50,22 +51,22 @@ class AlpacaApi(BaseApi):
 
         return domain_account
 
-    def _handle_kwargs_submit_order(self, **kwargs: Any) -> Dict:
-        """Function to initialize missing kwargs for submit_order function."""
-        # Initialize default kwargs if necessary
-        if "time_in_force" not in kwargs:
-            kwargs["time_in_force"] = "day"
-        if "extended_hours" not in kwargs:
-            kwargs["extended_hours"] = None
-        if "take_profit" not in kwargs:
-            kwargs["take_profit"] = None
-        if "stop_loss" not in kwargs:
-            kwargs["stop_loss"] = None
-        if "trail_price" not in kwargs:
-            kwargs["trail_price"] = None
-        if "trail_percent" not in kwargs:
-            kwargs["trail_percent"] = None
-        return kwargs
+    # def _handle_kwargs_submit_order(self, **kwargs: Any) -> Dict:
+    #     """Function to initialize missing kwargs for submit_order function."""
+    #     # Initialize default kwargs if necessary
+    #     if "time_in_force" not in kwargs:
+    #         kwargs["time_in_force"] = "day"
+    #     if "extended_hours" not in kwargs:
+    #         kwargs["extended_hours"] = None
+    #     if "take_profit" not in kwargs:
+    #         kwargs["take_profit"] = None
+    #     if "stop_loss" not in kwargs:
+    #         kwargs["stop_loss"] = None
+    #     if "trail_price" not in kwargs:
+    #         kwargs["trail_price"] = None
+    #     if "trail_percent" not in kwargs:
+    #         kwargs["trail_percent"] = None
+    #    return kwargs
 
     async def get_clock(self) -> DomainClock:
         """Returns the clock."""
@@ -254,7 +255,7 @@ class AlpacaApi(BaseApi):
         get_position_async = async_wrap(self.api.get_position)
         position = await get_position_async(symbol=symbol)
 
-        # Map position to domain position
+        # Map positions to domain positions
         position_mapper = PositionMapper()
         domain_position = position_mapper.map(position)
 
@@ -266,13 +267,13 @@ class AlpacaApi(BaseApi):
         close_position_async = async_wrap(self.api.close_position)
         order = await close_position_async(symbol=symbol)
 
-        # Map position to domain position
+        # Map positions to domain positions
         order_mapper = OrderMapper()
         domain_order = order_mapper.map(order)
 
         return domain_order
 
-    async def close_all_positions(self, **kwargs: Any) -> List[DomainPosition]:
+    async def close_all_positions(self, **kwargs: Any) -> List[ClosedPosition]:
         """Liquidates all open positions at market price."""
         # Get list of closed positions
         close_all_positions_async = async_wrap(self.api.close_all_positions)
@@ -282,7 +283,4 @@ class AlpacaApi(BaseApi):
         closed_position_mapper = ClosedPositionMapper()
         domain_closed_positions_list = [closed_position_mapper.map(closed_position) for closed_position in closed_positions]
         
-        #order_mapper = OrderMapper()
-        #domain_order_list = [order_mapper.map(order.body) for order in order_list]
-
         return domain_closed_positions_list

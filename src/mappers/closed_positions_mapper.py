@@ -1,21 +1,20 @@
 """A mapper maps all day."""
-from domainmodels.closed_position import ClosedPosition, ClosedPositionError
-from mappers.order_mapper import OrderMapper
 from typing import Any
+
+from domainmodels.closed_position import ClosedPosition, ClosedPositionError
 from mappers.mapper import Mapper
 
 
 class ClosedPositionMapper(Mapper[Any, ClosedPosition]):
     """Mapper to map from Any to ClosedPosition."""
 
-    def map(self, position: Mapper[Any, ClosedPosition]) -> ClosedPosition:
+    def map(self, position: Any) -> ClosedPosition:
         """Function to map from Any to ClosedPosition."""
         closed_position = ClosedPosition()
         closed_position.symbol = position.symbol
         closed_position.http_status_code = int(position.status)
 
         try:
-            #order_mapper = OrderMapper()
             closed_position.order = position.body
         except:
             closed_position.order = None
