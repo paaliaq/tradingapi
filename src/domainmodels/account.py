@@ -22,6 +22,7 @@ class DomainAccount():
     id: UUID
     account_number: str
     account_blocked: bool
+    accrued_fees: float
     buying_power: str
     cash: str
     created_at: datetime
@@ -35,7 +36,9 @@ class DomainAccount():
     long_market_value: str
     maintenance_margin: str
     multiplier: int
+    non_marginable_buying_power: float
     pattern_day_trader: bool
+    pending_transfer_in: float
     portfolio_value: str
     regt_buying_power: str
     short_market_value: int

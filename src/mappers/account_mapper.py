@@ -1,7 +1,8 @@
 """Account mapper."""
 from alpaca_trade_api.entity import Account
-from domainmodels.account import DomainAccount, Status
+from dateutil import parser
 
+from domainmodels.account import DomainAccount, Status
 from mappers.mapper import Mapper
 
 
@@ -16,9 +17,11 @@ class AccountMapper(Mapper[Account, DomainAccount]):
         domain_account.id = account.id
         domain_account.account_number = account.account_number
         domain_account.account_blocked = account.account_blocked
+        domain_account.accrued_fees = float(account.accrued_fees)
         domain_account.buying_power = float(account.buying_power)
         domain_account.cash = float(account.cash)
-        domain_account.created_at = account.created_at
+        domain_account.created_at = parser.parse(account.created_at)
+        domain_account.crypto_status = account.crypto_status
         domain_account.currency = account.currency
         domain_account.daytrade_count = int(account.daytrade_count)
         domain_account.daytrading_buying_power = float(account.daytrading_buying_power)
@@ -29,7 +32,9 @@ class AccountMapper(Mapper[Account, DomainAccount]):
         domain_account.long_market_value = float(account.long_market_value)
         domain_account.maintenance_margin = float(account.maintenance_margin)
         domain_account.multiplier = float(account.multiplier)
+        domain_account.non_marginable_buying_power = float(account.non_marginable_buying_power)
         domain_account.pattern_day_trader = account.pattern_day_trader
+        domain_account.pending_transfer_in = float(account.pending_transfer_in)
         domain_account.portfolio_value = float(account.portfolio_value)
         domain_account.regt_buying_power = float(account.regt_buying_power)
         domain_account.short_market_value = float(account.short_market_value)

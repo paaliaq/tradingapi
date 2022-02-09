@@ -41,8 +41,8 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
         self.alpaca_api.api.get_account.return_value = dh.import_api_get_account()
         account = await self.alpaca_api.get_account()
-        # expected_account = dh.import_expected_get_account_pydantic()
-        # compare(account, expected_account, prefix="Expected account object is different.")
+        expected_account = dh.import_expected_get_account()
+        compare(account, expected_account, prefix="Expected account object is different.")
 
     async def test_cancel_all_orders(self):
         """Test the get cancel all orders method."""
@@ -91,25 +91,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
         # canceled_order = await self.alpaca_api.cancel_order()
         # expected_cancel_order= dh.import_expected_cancel_order()
         # compare(canceled_order, expected_cancel_order, prefix="Expected canceled order object is different.")
-
-        pass
-
-    async def test_cancel_all_orders(self):
-        """Test the cancel all orders method."""
-
-        # self.alpaca_api.api.cancel_all_orders.return_value = dh.import_api_cancel_all_orders()
-        # canceled_orders = await self.alpaca_api.cancel_all_orders()
-        # expected_canceled_orders = dh.import_expected_cancel_all_orders()
-        # compare(canceled_orders, expected_canceled_orders, prefix="Expected canceled orders object is different.")
-        pass
-
-    async def test_submit_order(self):
-        """Test the submit order method."""
-
-        # self.alpaca_api.api.submit_order.return_value = dh.import_api_submit_order()
-        # order = await self.alpaca_api.submit_order()
-        # expected_order = dh.import_expected_submit_order()
-        # compare(order, expected_order, prefix="Expected order object is different.")
 
         pass
 
