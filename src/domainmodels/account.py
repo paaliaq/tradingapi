@@ -16,7 +16,7 @@ class Status(str, Enum):
     REJECTED = "REJECTED"
 
 
-class DomainAccount:
+class DomainAccount():
     """An account."""
 
     id: UUID
