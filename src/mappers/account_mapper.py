@@ -1,4 +1,5 @@
 """Account mapper."""
+
 from alpaca_trade_api.entity import Account
 from dateutil import parser
 
@@ -20,10 +21,16 @@ class AccountMapper(Mapper[Account, DomainAccount]):
         domain_account.accrued_fees = float(account.accrued_fees)
         domain_account.buying_power = float(account.buying_power)
         domain_account.cash = float(account.cash)
-        domain_account.created_at = parser.parse(account.created_at)
+
+        try:
+            domain_account.created_at = parser.parse(account.created_at)
+        except TypeError:
+            domain_account.created_at = account.created_at.to_pydatetime()
+
         domain_account.crypto_status = account.crypto_status
         domain_account.currency = account.currency
         domain_account.daytrade_count = int(account.daytrade_count)
+        # noinspection DuplicatedCode
         domain_account.daytrading_buying_power = float(account.daytrading_buying_power)
         domain_account.equity = float(account.equity)
         domain_account.initial_margin = float(account.initial_margin)

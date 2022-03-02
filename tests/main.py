@@ -1,12 +1,17 @@
 import asyncio
 import datetime
+import json
 import pickle
+import sys
+
+sys.path.insert(0, '../src')
+
+print(sys.path)
 
 from domainmodels.account import DomainAccount
 from domainmodels.clock import DomainClock
 from domainmodels.closed_position import ClosedPosition
-from domainmodels.order import DomainOrder
-from domainmodels.order import OrderSide
+from domainmodels.order import DomainOrder, OrderSide
 from domainmodels.order import Type as OrderType
 from domainmodels.position import DomainPosition
 from domainmodels.trading_day import TradingDay
@@ -30,11 +35,7 @@ async def main() -> None:
     assert hasattr(clock, "is_open")
 
     # Check that get_account works
-    # account_alpaca = api.api.get_account()
     account = await api.get_account()
-
-    with open("data/get_account/expected_get_account.pkl", "wb") as file:
-        pickle.dump(account, file)
 
     assert isinstance(account, DomainAccount)
     assert hasattr(account, "cash")
@@ -56,8 +57,8 @@ async def main() -> None:
         limit_price=10000  # set high limit s.t. the order does not get filled
     )
 
-    with open("data/get_account/expected_submit_order.pkl") as file:
-        pickle.dump(tsla_stop_limit_order, file)
+    with open("data/submit_order/api_submit_order.json", 'w') as file:
+        json.dump(tsla_stop_limit_order.__dict__, file)
 
     assert isinstance(tsla_stop_limit_order, DomainOrder)
     assert hasattr(tsla_stop_limit_order, "limit_price")
