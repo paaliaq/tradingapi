@@ -6,6 +6,7 @@ from testfixtures import compare
 
 import testhelpers.data_helper as dh
 from tradingapi.alpaca.alpaca_api import AlpacaApi
+from domainmodels.order import OrderSide, Type as OrderType
 
 
 class AlpacaTests(aiounittest.AsyncTestCase):
@@ -23,7 +24,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_get_clock_ok(self):
         """Test the clock method."""
-
         # Import the fake api call that is going to be sent in to wrapper function
         self.alpaca_api.api.get_clock.return_value = dh.import_api_get_clock()
 
@@ -38,7 +38,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_get_account_ok(self):
         """Test the get account method."""
-
         self.alpaca_api.api.get_account.return_value = dh.import_api_get_account()
         account = await self.alpaca_api.get_account()
         expected_account = dh.import_expected_get_account()
@@ -46,7 +45,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_cancel_all_orders_ok(self):
         """Test the get cancel all orders method."""
-
         self.alpaca_api.api.cancel_all_orders.return_value = None
 
         try:
@@ -56,17 +54,21 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_submit_order_ok(self):
         """Test the submit order method."""
-
         self.alpaca_api.api.submit_order.return_value = dh.import_api_submit_order()
-        order = await self.alpaca_api.submit_order()
-        # expected_order = dh.import_expected_submit_order()
-        # compare(order, expected_order, prefix="Expected order object is different.")
+        order = await self.alpaca_api.submit_order(
+            symbol="TSLA",
+            qty=1,
+            side=OrderSide.BUY,
+            type=OrderType.STOP_LIMIT,
+            stop_price=1400,
+            limit_price=10000
+        )
 
-        pass
+        expected_order = dh.import_expected_submit_order()
+        compare(order, expected_order, prefix="Expected order object is different.")
 
     async def test_get_order_ok(self):
         """Test the get order method."""
-
         # self.alpaca_api.api.get_order.return_value = dh.import_api_get_order()
         # order = await self.alpaca_api.get_order()
         # expected_order = dh.import_expected_get_order()
@@ -76,7 +78,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_list_orders_ok(self):
         """Test the list orders method."""
-
         # self.alpaca_api.api.list_orders.return_value = dh.import_api_list_orders()
         # orders = await self.alpaca_api.list_orders()
         # expected_orders = dh.import_expected_list_orders()
@@ -87,7 +88,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_cancel_order_ok(self):
         """Test the cancel order method."""
-
         # self.alpaca_api.api.cancel_order.return_value = dh.import_api_cancel_order()
         # canceled_order = await self.alpaca_api.cancel_order()
         # expected_cancel_order= dh.import_expected_cancel_order()
@@ -97,7 +97,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_list_positions_ok(self):
         """Test the list positions method."""
-
         # self.alpaca_api.api.list_positions.return_value = dh.import_api_list_positions()
         # positions = await self.alpaca_api.list_positions()
         # expected_order = dh.import_expected_list_positions()
@@ -107,7 +106,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_get_position_ok(self):
         """Test the get position method."""
-
         # self.alpaca_api.api.get_position.return_value = dh.import_api_get_position()
         # position = await self.alpaca_api.get_position()
 
@@ -115,7 +113,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_close_position_ok(self):
         """Test the close position method."""
-
         # self.alpaca_api.api.close_position.return_value = dh.import_api_close_position()
         # closed_position = await self.alpaca_api.close_position()
 
@@ -123,7 +120,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_close_all_positions_ok(self):
         """Test the close all positions method."""
-
         # self.alpaca_api.api.close_all_positions.return_value = dh.import_api_close_all_positions()
         # closed_positions = await self.alpaca_api.close_all_positions()
 
@@ -131,7 +127,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_get_trading_days_ok(self):
         """Test the get trading days method."""
-
         # self.alpaca_api.api.get_trading_days.return_value = dh.import_api_get_trading_days()
         # trading_days = await self.alpaca_api.get_trading_days()
 

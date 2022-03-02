@@ -1,0 +1,16 @@
+{
+    "symbol": "TSLA",
+    "id": "623fc75a-a9d0-4ac0-9a6c-c7bfc5a37e1a",
+    "qty": "1",
+    "side": "buy",
+    "type": "stop_limit",
+    "time_in_force": "day",
+    "limit_price": "10000",
+    "stop_price": "1400",
+    "extended_hours": false,
+    "trail_price": null,
+    "trail_percent": null,
+    "notional": null,
+    "take_profit": null,
+    "stop_loss": null
+}

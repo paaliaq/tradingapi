@@ -57,8 +57,10 @@ async def main() -> None:
         limit_price=10000  # set high limit s.t. the order does not get filled
     )
 
-    with open("data/submit_order/api_submit_order.json", 'w') as file:
+    with open("tests/data/submit_order/expected_submit_order.json", 'w') as file:
         json.dump(tsla_stop_limit_order.__dict__, file)
+
+    sys.exit()
 
     assert isinstance(tsla_stop_limit_order, DomainOrder)
     assert hasattr(tsla_stop_limit_order, "limit_price")
@@ -67,8 +69,8 @@ async def main() -> None:
     # my_orders = api.api.list_orders()
     my_orders = await api.list_orders()
 
-    with open("data/get_account/expected_list_orders.pkl") as file:
-        pickle.dump(my_orders, file)
+    #with open("data/get_account/expected_list_orders.pkl") as file:
+    #    pickle.dump(my_orders, file)
 
     assert len(my_orders) > 0
     assert all([isinstance(order, DomainOrder) for order in my_orders])
@@ -77,7 +79,7 @@ async def main() -> None:
     # tsla_stop_limit_order_dupe = api.api.get_order(order_id=tsla_stop_limit_order.id)
     tsla_stop_limit_order_dupe = await api.get_order(order_id=tsla_stop_limit_order.id)
 
-    with open("data/get_account/expected_get_order.pkl") as file:
+    with open("tests/data/get_account/expected_get_order.pkl") as file:
         pickle.dump(tsla_stop_limit_order_dupe, file)
 
     assert isinstance(tsla_stop_limit_order_dupe, DomainOrder)
@@ -109,8 +111,8 @@ async def main() -> None:
     # Check that list_positions works
     my_positions = await api.list_positions()
 
-    with open("data/get_account/expected_list_positions.pkl") as file:
-        pickle.dump(my_positions, file)
+    #with open("data/get_account/expected_list_positions.pkl") as file:
+    #    pickle.dump(my_positions, file)
 
     assert len(my_positions) > 0
     assert all([isinstance(position, DomainPosition) for position in my_positions])
@@ -119,8 +121,8 @@ async def main() -> None:
     # Check that get_position works
     aapl_position = await api.get_position(symbol="AAPL")
 
-    with open("data/get_account/expected_get_position.pkl") as file:
-        pickle.dump(aapl_position, file)
+    #with open("data/get_account/expected_get_position.pkl") as file:
+    #    pickle.dump(aapl_position, file)
 
     assert isinstance(aapl_position, DomainPosition)
     assert hasattr(aapl_position, "side")

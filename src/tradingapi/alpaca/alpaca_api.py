@@ -157,6 +157,11 @@ class AlpacaApi(BaseApi):
             instructions=None,  # not documented in alpaca?
         )
 
+        import json
+
+        with open("tests/data/submit_order/api_submit_order.json", 'w') as file:
+            json.dump(order.__dict__, file)
+
         # Mapping
         order_mapper = OrderMapper()
         domain_order = order_mapper.map(order)
