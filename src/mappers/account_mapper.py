@@ -39,7 +39,9 @@ class AccountMapper(Mapper[Account, DomainAccount]):
         domain_account.long_market_value = float(account.long_market_value)
         domain_account.maintenance_margin = float(account.maintenance_margin)
         domain_account.multiplier = float(account.multiplier)
-        domain_account.non_marginable_buying_power = float(account.non_marginable_buying_power)
+        domain_account.non_marginable_buying_power = float(
+            account.non_marginable_buying_power
+        )
         domain_account.pattern_day_trader = account.pattern_day_trader
         domain_account.pending_transfer_in = float(account.pending_transfer_in)
         domain_account.portfolio_value = float(account.portfolio_value)

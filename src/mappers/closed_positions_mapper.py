@@ -16,7 +16,8 @@ class ClosedPositionMapper(Mapper[Any, ClosedPosition]):
 
         try:
             closed_position.order = position.body
-        except:
+        except Exception as e:
+            print(e)
             closed_position.order = None
 
         try:
@@ -28,7 +29,8 @@ class ClosedPositionMapper(Mapper[Any, ClosedPosition]):
             closed_position.error.held_for_orders = int(position.body.held_for_orders)
             closed_position.error.message = position.body.held_for_orders.message
             closed_position.error.symbol = position.body.symbol
-        except:
+        except Exception as e:
+            print(e)
             closed_position.error = None
 
         return closed_position

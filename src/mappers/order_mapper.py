@@ -34,7 +34,9 @@ class OrderMapper(Mapper[Order, DomainOrder]):
         # Take Profit
         try:
             take_profit = TakeProfit()
-            take_profit.limit_price = order.take_profit and order.take_profit.limit_price
+            take_profit.limit_price = (
+                order.take_profit and order.take_profit.limit_price
+            )
             domain_order.take_profit = take_profit
         except AttributeError:
             domain_order.take_profit = None
@@ -47,5 +49,5 @@ class OrderMapper(Mapper[Order, DomainOrder]):
             domain_order.stop_loss = stop_loss
         except AttributeError:
             domain_order.stop_loss = None
-            
+
         return domain_order

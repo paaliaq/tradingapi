@@ -48,41 +48,44 @@ async def main() -> None:
     # Check that submit_order works
     # order_alpaca = api.api.submit_order(symbol="TSLA", qty=1, side="buy", 
     # type="stop_limit", stop_price=1400, limit_price=10000, time_in_force="day")
-    tsla_stop_limit_order = await api.submit_order(
-        symbol="TSLA",
-        qty=1,
-        side=OrderSide.BUY,
-        type=OrderType.STOP_LIMIT,
-        stop_price=1400,
-        limit_price=10000  # set high limit s.t. the order does not get filled
-    )
+    # tsla_stop_limit_order = await api.submit_order(
+    #     symbol="TSLA",
+    #     qty=1,
+    #     side=OrderSide.BUY,
+    #     type=OrderType.STOP_LIMIT,
+    #     stop_price=1400,
+    #     limit_price=10000  # set high limit s.t. the order does not get filled
+    # )
 
-    with open("tests/data/submit_order/expected_submit_order.json", 'w') as file:
-        json.dump(tsla_stop_limit_order.__dict__, file)
-
+    # with open("tests/data/submit_order/expected_submit_order.json", 'w') as file:
+    #     json.dump(tsla_stop_limit_order.__dict__, file)
     sys.exit()
+
 
     assert isinstance(tsla_stop_limit_order, DomainOrder)
     assert hasattr(tsla_stop_limit_order, "limit_price")
 
     # Check that list_orders works
     # my_orders = api.api.list_orders()
-    my_orders = await api.list_orders()
+    # my_orders = await api.list_orders()
 
     #with open("data/get_account/expected_list_orders.pkl") as file:
     #    pickle.dump(my_orders, file)
 
-    assert len(my_orders) > 0
-    assert all([isinstance(order, DomainOrder) for order in my_orders])
+    # assert len(my_orders) > 0
+    # assert all([isinstance(order, DomainOrder) for order in my_orders])
 
     # Check that get_order works
-    # tsla_stop_limit_order_dupe = api.api.get_order(order_id=tsla_stop_limit_order.id)
-    tsla_stop_limit_order_dupe = await api.get_order(order_id=tsla_stop_limit_order.id)
+    # print(tsla_stop_limit_order.id)
+    # tsla_stop_limit_order_dupe = await api.get_order(order_id=tsla_stop_limit_order.id)
+    # with open("tests/data/get_order/expected_get_order.json", "w") as file:
+    #     json.dump(tsla_stop_limit_order_dupe.__dict__, file)
+    # assert isinstance(tsla_stop_limit_order_dupe, DomainOrder)
 
-    with open("tests/data/get_account/expected_get_order.pkl") as file:
-        pickle.dump(tsla_stop_limit_order_dupe, file)
+    # tsla_stop_limit_order = api.api.get_order(order_id=tsla_stop_limit_order.id)
+    # with open("tests/data/get_order/api_get_order.json", "w") as file:
+    #     json.dump(tsla_stop_limit_order.__dict__, file)
 
-    assert isinstance(tsla_stop_limit_order_dupe, DomainOrder)
 
     # Check that cancel_order works
     await api.cancel_order(order_id=tsla_stop_limit_order.id)  # it returns None

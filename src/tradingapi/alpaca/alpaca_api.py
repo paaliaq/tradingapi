@@ -159,7 +159,7 @@ class AlpacaApi(BaseApi):
 
         import json
 
-        with open("tests/data/submit_order/api_submit_order.json", 'w') as file:
+        with open("tests/data/submit_order/api_submit_order.json", "w") as file:
             json.dump(order.__dict__, file)
 
         # Mapping
@@ -250,7 +250,9 @@ class AlpacaApi(BaseApi):
 
         # Map position list to domain position list
         position_mapper = PositionMapper()
-        domain_position_list = [position_mapper.map(position) for position in position_list]
+        domain_position_list = [
+            position_mapper.map(position) for position in position_list
+        ]
 
         return domain_position_list
 
@@ -286,6 +288,9 @@ class AlpacaApi(BaseApi):
 
         # Map position list to domain position list
         closed_position_mapper = ClosedPositionMapper()
-        domain_closed_positions_list = [closed_position_mapper.map(closed_position) for closed_position in closed_positions]
-        
+        domain_closed_positions_list = [
+            closed_position_mapper.map(closed_position)
+            for closed_position in closed_positions
+        ]
+
         return domain_closed_positions_list

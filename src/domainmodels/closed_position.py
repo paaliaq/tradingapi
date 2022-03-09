@@ -1,9 +1,12 @@
 """The closed position response."""
 
-from typing import Optional, List
+from typing import Optional
 from domainmodels.order import DomainOrder
 
+
 class ClosedPositionError:
+    """ClosedPositionError."""
+
     available: int
     code: int
     existing_qty: int
@@ -11,7 +14,10 @@ class ClosedPositionError:
     message: str
     symbol: str
 
+
 class ClosedPosition:
+    """ClosedPosition."""
+
     symbol: str
     http_status_code: int
     order: Optional[DomainOrder]

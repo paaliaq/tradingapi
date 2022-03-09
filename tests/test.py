@@ -69,12 +69,11 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_get_order_ok(self):
         """Test the get order method."""
-        # self.alpaca_api.api.get_order.return_value = dh.import_api_get_order()
-        # order = await self.alpaca_api.get_order()
-        # expected_order = dh.import_expected_get_order()
-        # compare(order, expected_order, prefix="Expected order object is different.")
-
-        pass
+        order_id = "4d14a279-275b-4e28-8303-1a8f26b1ff51"
+        self.alpaca_api.api.get_order.return_value = dh.import_api_get_order()
+        order = await self.alpaca_api.get_order(order_id)
+        expected_order = dh.import_expected_get_order()
+        compare(order, expected_order, prefix="Expected order object is different.")
 
     async def test_list_orders_ok(self):
         """Test the list orders method."""
@@ -82,18 +81,19 @@ class AlpacaTests(aiounittest.AsyncTestCase):
         # orders = await self.alpaca_api.list_orders()
         # expected_orders = dh.import_expected_list_orders()
         # compare(orders, expected_orders, prefix="Expected orders object is different.")
-
         pass
 
 
     async def test_cancel_order_ok(self):
         """Test the cancel order method."""
-        # self.alpaca_api.api.cancel_order.return_value = dh.import_api_cancel_order()
-        # canceled_order = await self.alpaca_api.cancel_order()
-        # expected_cancel_order= dh.import_expected_cancel_order()
-        # compare(canceled_order, expected_cancel_order, prefix="Expected canceled order object is different.")
+        self.alpaca_api.api.cancel_order.return_value = None
+        order_id = "4d14a279-275b-4e28-8303-1a8f26b1ff51"
 
-        pass
+        try:
+            await self.alpaca_api.cancel_order(order_id)
+        except Exception as ex:
+            assert False, f"test_cancel_order_ok raised exception {ex}"
+
 
     async def test_list_positions_ok(self):
         """Test the list positions method."""
