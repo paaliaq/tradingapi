@@ -77,12 +77,10 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_list_orders_ok(self):
         """Test the list orders method."""
-        # self.alpaca_api.api.list_orders.return_value = dh.import_api_list_orders()
-        # orders = await self.alpaca_api.list_orders()
-        # expected_orders = dh.import_expected_list_orders()
-        # compare(orders, expected_orders, prefix="Expected orders object is different.")
-        pass
-
+        self.alpaca_api.api.list_orders.return_value = dh.import_api_list_orders()
+        orders = await self.alpaca_api.list_orders()
+        expected_orders = dh.import_expected_list_orders()
+        compare(orders, expected_orders, prefix="Expected orders object is different.")
 
     async def test_cancel_order_ok(self):
         """Test the cancel order method."""

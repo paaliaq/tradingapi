@@ -28,20 +28,20 @@ async def main() -> None:
 
     api = AlpacaApi(api_settings)
 
-    # Check that get_clock works
-    # account_alpaca = api.api.get_clock()
-    clock = await api.get_clock()
-    assert isinstance(clock, DomainClock)
-    assert hasattr(clock, "is_open")
+    # # Check that get_clock works
+    # # account_alpaca = api.api.get_clock()
+    # clock = await api.get_clock()
+    # assert isinstance(clock, DomainClock)
+    # assert hasattr(clock, "is_open")
 
-    # Check that get_account works
-    account = await api.get_account()
+    # # Check that get_account works
+    # account = await api.get_account()
 
-    assert isinstance(account, DomainAccount)
-    assert hasattr(account, "cash")
+    # assert isinstance(account, DomainAccount)
+    # assert hasattr(account, "cash")
 
-    # Check that cancel_all_orders works (it returns None)
-    await api.cancel_all_orders()
+    # # Check that cancel_all_orders works (it returns None)
+    # await api.cancel_all_orders()
 
     # TODO: Dumps conducted until here.
 
@@ -59,8 +59,49 @@ async def main() -> None:
 
     # with open("tests/data/submit_order/expected_submit_order.json", 'w') as file:
     #     json.dump(tsla_stop_limit_order.__dict__, file)
-    sys.exit()
 
+    #################################################################################
+    # Check that list_orders works
+    #################################################################################
+
+    # First cancel all orders to start with a clean sheet
+    await api.cancel_all_orders()
+
+    # Place 2 orders so we have >1 order in our list of orders
+    tsla_stop_limit_order = await api.submit_order(
+        symbol="TSLA",
+        qty=1,
+        side=OrderSide.BUY,
+        type=OrderType.STOP_LIMIT,
+        stop_price=1400,
+        limit_price=1  # set small limit s.t. the order does not get filled
+    )
+
+    msft_stop_limit_order = await api.submit_order(
+        symbol="MSFT",
+        qty=1,
+        side=OrderSide.BUY,
+        type=OrderType.STOP_LIMIT,
+        stop_price=1400,
+        limit_price=1  # set small limit s.t. the order does not get filled
+    )
+
+
+    # Write out expected list order
+    order_list = await api.list_orders()
+    #print([order.__dict__ for order in order_list])
+
+    with open("tests/data/list_orders/expected_list_orders.json", 'w') as file:
+        json.dump([order.__dict__ for order in order_list], file)
+
+    # Write out api list order
+    order_list_api = api.api.list_orders()
+    #print([order.__dict__ for order in order_list_api])
+
+    with open("tests/data/list_orders/api_list_orders.json", 'w') as file:
+        json.dump([order.__dict__ for order in order_list_api], file)
+
+    sys.exit()
 
     assert isinstance(tsla_stop_limit_order, DomainOrder)
     assert hasattr(tsla_stop_limit_order, "limit_price")
@@ -102,7 +143,7 @@ async def main() -> None:
     )
     msft_market_order = await api.submit_order(
         symbol="MSFT",
-        qty=1,
+        qty=2,
         side=OrderSide.BUY,
         type=OrderType.MARKET
     )

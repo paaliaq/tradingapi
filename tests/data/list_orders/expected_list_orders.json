@@ -1,0 +1,34 @@
+[
+    {
+        "symbol": "MSFT",
+        "id": "1bbf1b9c-8643-436d-8715-8ae2b969d94c",
+        "qty": "1",
+        "side": "buy",
+        "type": "stop_limit",
+        "time_in_force": "day",
+        "limit_price": "1",
+        "stop_price": "1400",
+        "extended_hours": false,
+        "trail_price": null,
+        "trail_percent": null,
+        "notional": null,
+        "take_profit": null,
+        "stop_loss": null
+    },
+    {
+        "symbol": "TSLA",
+        "id": "4f610a37-ab11-4f40-bdb4-b5a7e4176738",
+        "qty": "1",
+        "side": "buy",
+        "type": "stop_limit",
+        "time_in_force": "day",
+        "limit_price": "1",
+        "stop_price": "1400",
+        "extended_hours": false,
+        "trail_price": null,
+        "trail_percent": null,
+        "notional": null,
+        "take_profit": null,
+        "stop_loss": null
+    }
+]

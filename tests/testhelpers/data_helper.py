@@ -82,17 +82,32 @@ def import_expected_get_order() -> DomainOrder:
         return domain_order
 
 
-def import_api_list_orders() -> Order:
+def import_api_list_orders() -> List[Order]:
     """Import the simulated output from the alpaca api."""
     with open("tests/data/list_orders/api_list_orders.json", "r") as data:
-        api_order = Order(None)
-        api_order.__dict__ = json.loads(data.read())
-        return api_order
+
+        order_list = json.loads(data.read())
+        api_order_list = []
+        for order in order_list:
+            api_order = Order(None)
+            api_order.__dict__ = order
+            api_order_list.append(api_order)
+
+        return api_order_list
 
 
-def import_expected_list_orders() -> DomainOrder:
+def import_expected_list_orders() -> List[DomainOrder]:
     """Import the expected output from the alpaca api wrapper."""
     with open("tests/data/list_orders/expected_list_orders.json", "r") as data:
-        domain_order = DomainOrder(None)
-        domain_order.__dict__ = json.loads(data.read())
-        return domain_order
+
+        order_list = json.loads(data.read())
+        domain_order_list = []
+        for order in order_list:
+            domain_order = DomainOrder(None)
+            domain_order.__dict__ = order
+            domain_order.side = OrderSide[domain_order.side.upper()]
+            domain_order.type = Type[domain_order.type.upper()]
+            domain_order_list.append(domain_order)
+
+        return domain_order_list
+
