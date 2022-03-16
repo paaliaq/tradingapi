@@ -1,5 +1,5 @@
 import asyncio
-import datetime
+from datetime import datetime
 import json
 import pickle
 import sys
@@ -57,61 +57,93 @@ async def main() -> None:
     #     limit_price=10000  # set high limit s.t. the order does not get filled
     # )
 
-    # with open("tests/data/submit_order/expected_submit_order.json", 'w') as file:
-    #     json.dump(tsla_stop_limit_order.__dict__, file)
+    # with open("tests/data/submit_order/expected_submit_order.json", 'w') as f:
+    #     json.dump(tsla_stop_limit_order.__dict__, f)
 
     #################################################################################
     # Check that list_orders works
     #################################################################################
 
-    # First cancel all orders to start with a clean sheet
-    await api.cancel_all_orders()
+    # # First cancel all orders to start with a clean sheet
+    # await api.cancel_all_orders()
 
-    # Place 2 orders so we have >1 order in our list of orders
-    tsla_stop_limit_order = await api.submit_order(
-        symbol="TSLA",
-        qty=1,
-        side=OrderSide.BUY,
-        type=OrderType.STOP_LIMIT,
-        stop_price=1400,
-        limit_price=1  # set small limit s.t. the order does not get filled
-    )
+    # # Place 2 orders so we have >1 order in our list of orders
+    # tsla_stop_limit_order = await api.submit_order(
+    #     symbol="TSLA",
+    #     qty=1,
+    #     side=OrderSide.BUY,
+    #     type=OrderType.STOP_LIMIT,
+    #     stop_price=1400,
+    #     limit_price=1  # set small limit s.t. the order does not get filled
+    # )
 
-    msft_stop_limit_order = await api.submit_order(
-        symbol="MSFT",
-        qty=1,
-        side=OrderSide.BUY,
-        type=OrderType.STOP_LIMIT,
-        stop_price=1400,
-        limit_price=1  # set small limit s.t. the order does not get filled
-    )
+    # msft_stop_limit_order = await api.submit_order(
+    #     symbol="MSFT",
+    #     qty=1,
+    #     side=OrderSide.BUY,
+    #     type=OrderType.STOP_LIMIT,
+    #     stop_price=1400,
+    #     limit_price=1  # set small limit s.t. the order does not get filled
+    # )
 
 
-    # Write out expected list order
-    order_list = await api.list_orders()
-    #print([order.__dict__ for order in order_list])
+    # # Write out expected list order
+    # order_list = await api.list_orders()
+    # #print([order.__dict__ for order in order_list])
 
-    with open("tests/data/list_orders/expected_list_orders.json", 'w') as file:
-        json.dump([order.__dict__ for order in order_list], file)
+    # with open("tests/data/list_orders/expected_list_orders.json", 'w') as f:
+    #     json.dump([order.__dict__ for order in order_list], f)
 
-    # Write out api list order
-    order_list_api = api.api.list_orders()
-    #print([order.__dict__ for order in order_list_api])
+    # # Write out api list order
+    # order_list_api = api.api.list_orders()
+    # #print([order.__dict__ for order in order_list_api])
 
-    with open("tests/data/list_orders/api_list_orders.json", 'w') as file:
-        json.dump([order.__dict__ for order in order_list_api], file)
+    # with open("tests/data/list_orders/api_list_orders.json", 'w') as f:
+    #     json.dump([order.__dict__ for order in order_list_api], f)
+
+    #################################################################################
+    # Check that list_orders works
+    #################################################################################
+
+    # Check trading days
+    from_dt = datetime(2022, 3, 1)
+    to_dt = datetime(2022, 3, 15)
+    format = '%Y-%m-%d %H:%M:%S'
+    
+    # Write out expected trading days
+    trading_days = await api.get_trading_days(from_dt, to_dt)
+    trading_days_converted = []
+    for day in trading_days:
+        day.__dict__["open"] = datetime.strftime(day.__dict__["open"], format)
+        day.__dict__["close"] = datetime.strftime(day.__dict__["close"], format)
+        trading_days_converted.append(day)
+    # print([day.__dict__ for day in trading_days_converted])
+
+    with open("tests/data/get_trading_days/expected_get_trading_days.json", "w") as f:
+        json.dump([day.__dict__ for day in trading_days_converted], f)
+
+    # Write out api trading days
+    trading_days_api = api.api.get_calendar(from_dt, to_dt)
+    # print([day.__dict__ for day in trading_days_api])
+    with open("tests/data/get_trading_days/api_get_trading_days.json", "w") as f:
+        json.dump([day.__dict__ for day in trading_days_api], f)
 
     sys.exit()
 
-    assert isinstance(tsla_stop_limit_order, DomainOrder)
-    assert hasattr(tsla_stop_limit_order, "limit_price")
+
+    #################################################################################
+    # Other
+    #################################################################################
+
+    # assert isinstance(tsla_stop_limit_order, DomainOrder)
+    # assert hasattr(tsla_stop_limit_order, "limit_price")
 
     # Check that list_orders works
     # my_orders = api.api.list_orders()
     # my_orders = await api.list_orders()
 
-    #with open("data/get_account/expected_list_orders.pkl") as file:
-    #    pickle.dump(my_orders, file)
+    #with open("data/get_account/expected_list_orders.pkl") as f:
+    #    pickle.dump(my_orders, f)
 
     # assert len(my_orders) > 0
     # assert all([isinstance(order, DomainOrder) for order in my_orders])
@@ -119,13 +151,13 @@ async def main() -> None:
     # Check that get_order works
     # print(tsla_stop_limit_order.id)
     # tsla_stop_limit_order_dupe = await api.get_order(order_id=tsla_stop_limit_order.id)
-    # with open("tests/data/get_order/expected_get_order.json", "w") as file:
-    #     json.dump(tsla_stop_limit_order_dupe.__dict__, file)
+    # with open("tests/data/get_order/expected_get_order.json", "w") as f:
+    #     json.dump(tsla_stop_limit_order_dupe.__dict__, f)
     # assert isinstance(tsla_stop_limit_order_dupe, DomainOrder)
 
     # tsla_stop_limit_order = api.api.get_order(order_id=tsla_stop_limit_order.id)
-    # with open("tests/data/get_order/api_get_order.json", "w") as file:
-    #     json.dump(tsla_stop_limit_order.__dict__, file)
+    # with open("tests/data/get_order/api_get_order.json", "w") as f:
+    #     json.dump(tsla_stop_limit_order.__dict__, f)
 
 
     # Check that cancel_order works
@@ -189,17 +221,7 @@ async def main() -> None:
     assert len(closed_positions) > 0
     assert all([isinstance(position, ClosedPosition) for position in closed_positions])
 
-    # Check trading days
-    from_dt = datetime.datetime(2020, 1, 1)
-    to_dt = datetime.datetime(2020, 2, 1)
 
-    trading_days = await api.get_trading_days(from_dt, to_dt)
-
-    with open("data/get_account/expected_get_trading_days.pkl") as file:
-        pickle.dump(trading_days, file)
-
-    assert all([isinstance(day, TradingDay) for day in trading_days])
-    assert len(trading_days) == 21
 
 
 if __name__ == "__main__":

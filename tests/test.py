@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import Mock
-
+from datetime import datetime
 import aiounittest
 from testfixtures import compare
 
@@ -125,11 +125,12 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_get_trading_days_ok(self):
         """Test the get trading days method."""
-        # self.alpaca_api.api.get_trading_days.return_value = dh.import_api_get_trading_days()
-        # trading_days = await self.alpaca_api.get_trading_days()
-
-        pass
-
+        from_dt = datetime(2022, 3, 1)
+        to_dt = datetime(2022, 3, 15)
+        self.alpaca_api.api.get_calendar.return_value = dh.import_api_get_trading_days()
+        trading_days = await self.alpaca_api.get_trading_days(from_dt, to_dt)
+        expected_trading_days = dh.import_expected_get_trading_days()
+        compare(trading_days, expected_trading_days, prefix="Expected trading days object is different.")
 
 if __name__ == '__main__':
     unittest.main()
