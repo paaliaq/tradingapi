@@ -102,11 +102,10 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_list_positions_ok(self):
         """Test the list positions method."""
-        # self.alpaca_api.api.list_positions.return_value = dh.import_api_list_positions()
-        # positions = await self.alpaca_api.list_positions()
-        # expected_order = dh.import_expected_list_positions()
-        # compare(order, expected_order, prefix="Expected order object is different.")
-        pass
+        self.alpaca_api.api.list_positions.return_value = dh.import_api_list_positions()
+        positions = await self.alpaca_api.list_positions()
+        expected_positions = dh.import_expected_list_positions()
+        compare(positions, expected_positions, prefix="Expected positions object is different.")
 
 
     async def test_close_position_ok(self):

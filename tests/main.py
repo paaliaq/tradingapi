@@ -153,9 +153,9 @@ async def main() -> None:
     #     side=OrderSide.BUY,
     #     type=OrderType.MARKET
     # )
+    # await asyncio.sleep(5) # wait 5 seconds to be sure the order went through
 
     # # Write expected position
-    # await asyncio.sleep(5) # wait 5 seconds to be sure the order went through
     # position = await api.get_position(symbol="AAPL")
     # # print(position.__dict__)
     # with open("tests/data/get_position/expected_get_position.json", "w") as f:
@@ -171,41 +171,16 @@ async def main() -> None:
 
 
     #################################################################################
-    # Other
+    # Check that test_list_positions_ok works
     #################################################################################
 
-    # assert isinstance(tsla_stop_limit_order, DomainOrder)
-    # assert hasattr(tsla_stop_limit_order, "limit_price")
+    # Close all positions
+    closed_positions = await api.close_all_positions()
 
-    # Check that list_orders works
-    # my_orders = api.api.list_orders()
-    # my_orders = await api.list_orders()
-
-    #with open("data/get_account/expected_list_orders.pkl") as f:
-    #    pickle.dump(my_orders, f)
-
-    # assert len(my_orders) > 0
-    # assert all([isinstance(order, DomainOrder) for order in my_orders])
-
-    # Check that get_order works
-    # print(tsla_stop_limit_order.id)
-    # tsla_stop_limit_order_dupe = await api.get_order(order_id=tsla_stop_limit_order.id)
-    # with open("tests/data/get_order/expected_get_order.json", "w") as f:
-    #     json.dump(tsla_stop_limit_order_dupe.__dict__, f)
-    # assert isinstance(tsla_stop_limit_order_dupe, DomainOrder)
-
-    # tsla_stop_limit_order = api.api.get_order(order_id=tsla_stop_limit_order.id)
-    # with open("tests/data/get_order/api_get_order.json", "w") as f:
-    #     json.dump(tsla_stop_limit_order.__dict__, f)
-
-
-    # Check that cancel_order works
-    await api.cancel_order(order_id=tsla_stop_limit_order.id)  # it returns None
-
-    # Check that cancel_all_orders works
+    # Close all orders
     await api.cancel_all_orders()  # it returns None
 
-    # Add two other orders that go through.
+    # Place two orders that go through
     aapl_market_order = await api.submit_order(
         symbol="AAPL",
         qty=1,
@@ -214,51 +189,116 @@ async def main() -> None:
     )
     msft_market_order = await api.submit_order(
         symbol="MSFT",
-        qty=2,
+        qty=1,
         side=OrderSide.BUY,
         type=OrderType.MARKET
     )
+    await asyncio.sleep(5) # wait 5 seconds to be sure the order went through
 
-    # TODO: Do we need to look ath the results here as well? Why are we not doing any test check here?
-    # with open("data/get_account/expected_get_order.pkl") as file:
-    #    pickle.dump(tsla_stop_limit_order_dupe, file)
+    # Write expected position list
+    position_list = await api.list_positions()
+    #print([position.__dict__ for position in position_list])
+    with open("tests/data/list_positions/expected_list_positions.json", "w") as f:
+        json.dump([position.__dict__ for position in position_list], f)
 
-    # Check that list_positions works
-    my_positions = await api.list_positions()
+    # Write out api position list
+    position_list_api = api.api.list_positions()
+    #print([position.__dict__ for position in position_list_api])
+    with open("tests/data/list_positions/api_list_positions.json", "w") as f:
+        json.dump([position.__dict__ for position in position_list_api], f)
 
-    #with open("data/get_account/expected_list_positions.pkl") as file:
-    #    pickle.dump(my_positions, file)
+    sys.exit()
 
-    assert len(my_positions) > 0
-    assert all([isinstance(position, DomainPosition) for position in my_positions])
-    assert all([hasattr(position, "side") for position in my_positions])
 
-    # Check that get_position works
-    aapl_position = await api.get_position(symbol="AAPL")
+    # #################################################################################
+    # # Other
+    # #################################################################################
 
-    #with open("data/get_account/expected_get_position.pkl") as file:
-    #    pickle.dump(aapl_position, file)
+    # # assert isinstance(tsla_stop_limit_order, DomainOrder)
+    # # assert hasattr(tsla_stop_limit_order, "limit_price")
 
-    assert isinstance(aapl_position, DomainPosition)
-    assert hasattr(aapl_position, "side")
+    # # Check that list_orders works
+    # # my_orders = api.api.list_orders()
+    # # my_orders = await api.list_orders()
 
-    # Check that close_position works
-    closed_aapl_order = await api.close_position(symbol="AAPL")
+    # #with open("data/get_account/expected_list_orders.pkl") as f:
+    # #    pickle.dump(my_orders, f)
 
-    with open("data/get_account/expected_close_position.pkl") as file:
-        pickle.dump(closed_aapl_order, file)
+    # # assert len(my_orders) > 0
+    # # assert all([isinstance(order, DomainOrder) for order in my_orders])
 
-    assert isinstance(closed_aapl_order, DomainOrder)
-    assert hasattr(closed_aapl_order, "side")
+    # # Check that get_order works
+    # # print(tsla_stop_limit_order.id)
+    # # tsla_stop_limit_order_dupe = await api.get_order(order_id=tsla_stop_limit_order.id)
+    # # with open("tests/data/get_order/expected_get_order.json", "w") as f:
+    # #     json.dump(tsla_stop_limit_order_dupe.__dict__, f)
+    # # assert isinstance(tsla_stop_limit_order_dupe, DomainOrder)
 
-    # Check that close_all_positions works
-    closed_positions = await api.close_all_positions()
+    # # tsla_stop_limit_order = api.api.get_order(order_id=tsla_stop_limit_order.id)
+    # # with open("tests/data/get_order/api_get_order.json", "w") as f:
+    # #     json.dump(tsla_stop_limit_order.__dict__, f)
 
-    with open("data/get_account/expected_close_all_positions.pkl") as file:
-        pickle.dump(closed_positions, file)
 
-    assert len(closed_positions) > 0
-    assert all([isinstance(position, ClosedPosition) for position in closed_positions])
+    # # Check that cancel_order works
+    # await api.cancel_order(order_id=tsla_stop_limit_order.id)  # it returns None
+
+    # # Check that cancel_all_orders works
+    # await api.cancel_all_orders()  # it returns None
+
+    # # Add two other orders that go through.
+    # aapl_market_order = await api.submit_order(
+    #     symbol="AAPL",
+    #     qty=1,
+    #     side=OrderSide.BUY,
+    #     type=OrderType.MARKET
+    # )
+    # msft_market_order = await api.submit_order(
+    #     symbol="MSFT",
+    #     qty=2,
+    #     side=OrderSide.BUY,
+    #     type=OrderType.MARKET
+    # )
+
+    # # TODO: Do we need to look ath the results here as well? Why are we not doing any test check here?
+    # # with open("data/get_account/expected_get_order.pkl") as file:
+    # #    pickle.dump(tsla_stop_limit_order_dupe, file)
+
+    # # Check that list_positions works
+    # my_positions = await api.list_positions()
+
+    # #with open("data/get_account/expected_list_positions.pkl") as file:
+    # #    pickle.dump(my_positions, file)
+
+    # assert len(my_positions) > 0
+    # assert all([isinstance(position, DomainPosition) for position in my_positions])
+    # assert all([hasattr(position, "side") for position in my_positions])
+
+    # # Check that get_position works
+    # aapl_position = await api.get_position(symbol="AAPL")
+
+    # #with open("data/get_account/expected_get_position.pkl") as file:
+    # #    pickle.dump(aapl_position, file)
+
+    # assert isinstance(aapl_position, DomainPosition)
+    # assert hasattr(aapl_position, "side")
+
+    # # Check that close_position works
+    # closed_aapl_order = await api.close_position(symbol="AAPL")
+
+    # with open("data/get_account/expected_close_position.pkl") as file:
+    #     pickle.dump(closed_aapl_order, file)
+
+    # assert isinstance(closed_aapl_order, DomainOrder)
+    # assert hasattr(closed_aapl_order, "side")
+
+    # # Check that close_all_positions works
+    # closed_positions = await api.close_all_positions()
+
+    # with open("data/get_account/expected_close_all_positions.pkl") as file:
+    #     pickle.dump(closed_positions, file)
+
+    # assert len(closed_positions) > 0
+    # assert all([isinstance(position, ClosedPosition) for position in closed_positions])
 
 
 

@@ -160,3 +160,30 @@ def import_expected_get_position() -> DomainPosition:
         domain_position.__dict__ = json.loads(d.read())
         return domain_position
 
+
+def import_api_list_positions() -> List[Position]:
+    """Import the simulated output from the alpaca api."""
+    with open("tests/data/list_positions/api_list_positions.json", "r") as d:
+
+        position_list = json.loads(d.read())
+        api_position_list = []
+        for position in position_list:
+            api_position = Position(None)
+            api_position.__dict__ = position
+            api_position_list.append(api_position)
+
+        return api_position_list
+
+
+def import_expected_list_positions() -> List[DomainPosition]:
+    """Import the expected output from the alpaca api wrapper."""
+    with open("tests/data/list_positions/expected_list_positions.json", "r") as d:
+
+        position_list = json.loads(d.read())
+        domain_position_list = []
+        for position in position_list:
+            domain_position = DomainPosition()
+            domain_position.__dict__ = position
+            domain_position_list.append(domain_position)
+
+        return domain_position_list
