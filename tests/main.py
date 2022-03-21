@@ -19,9 +19,16 @@ from tradingapi.alpaca.alpaca_api import AlpacaApi
 
 
 async def main() -> None:
+    # api_settings = {
+    #     "APCA_API_KEY_ID": "PK8HDG7R05LLSH8YM25W",
+    #     "APCA_API_SECRET_KEY": "tthYbkvPYymnDuQJDYsdmfZ7v9lFmec2KRal0tYF",
+    #     "APCA_API_BASE_URL": "https://paper-api.alpaca.markets",
+    #     "APCA_RETRY_MAX": "3"
+    # }
+
     api_settings = {
-        "APCA_API_KEY_ID": "PK8HDG7R05LLSH8YM25W",
-        "APCA_API_SECRET_KEY": "tthYbkvPYymnDuQJDYsdmfZ7v9lFmec2KRal0tYF",
+        "APCA_API_KEY_ID": "PKMLR3Z5916GTNCP10JI",
+        "APCA_API_SECRET_KEY": "hNJj2I3YoUGRLefjumNRvNSzMjCIjzygqT3r1rni",
         "APCA_API_BASE_URL": "https://paper-api.alpaca.markets",
         "APCA_RETRY_MAX": "3"
     }
@@ -105,30 +112,62 @@ async def main() -> None:
     # Check that list_orders works
     #################################################################################
 
-    # Check trading days
-    from_dt = datetime(2022, 3, 1)
-    to_dt = datetime(2022, 3, 15)
-    format = '%Y-%m-%d %H:%M:%S'
+    # # Check trading days
+    # from_dt = datetime(2022, 3, 1)
+    # to_dt = datetime(2022, 3, 15)
+    # format = '%Y-%m-%d %H:%M:%S'
     
-    # Write out expected trading days
-    trading_days = await api.get_trading_days(from_dt, to_dt)
-    trading_days_converted = []
-    for day in trading_days:
-        day.__dict__["open"] = datetime.strftime(day.__dict__["open"], format)
-        day.__dict__["close"] = datetime.strftime(day.__dict__["close"], format)
-        trading_days_converted.append(day)
-    # print([day.__dict__ for day in trading_days_converted])
+    # # Write out expected trading days
+    # trading_days = await api.get_trading_days(from_dt, to_dt)
+    # trading_days_converted = []
+    # for day in trading_days:
+    #     day.__dict__["open"] = datetime.strftime(day.__dict__["open"], format)
+    #     day.__dict__["close"] = datetime.strftime(day.__dict__["close"], format)
+    #     trading_days_converted.append(day)
+    # # print([day.__dict__ for day in trading_days_converted])
 
-    with open("tests/data/get_trading_days/expected_get_trading_days.json", "w") as f:
-        json.dump([day.__dict__ for day in trading_days_converted], f)
+    # with open("tests/data/get_trading_days/expected_get_trading_days.json", "w") as f:
+    #     json.dump([day.__dict__ for day in trading_days_converted], f)
 
-    # Write out api trading days
-    trading_days_api = api.api.get_calendar(from_dt, to_dt)
-    # print([day.__dict__ for day in trading_days_api])
-    with open("tests/data/get_trading_days/api_get_trading_days.json", "w") as f:
-        json.dump([day.__dict__ for day in trading_days_api], f)
+    # # Write out api trading days
+    # trading_days_api = api.api.get_calendar(from_dt, to_dt)
+    # # print([day.__dict__ for day in trading_days_api])
+    # with open("tests/data/get_trading_days/api_get_trading_days.json", "w") as f:
+    #     json.dump([day.__dict__ for day in trading_days_api], f)
 
-    sys.exit()
+
+    #################################################################################
+    # Check that test_get_position_ok works
+    #################################################################################
+
+    # # Close all positions
+    # closed_positions = await api.close_all_positions()
+
+    # # Close all orders
+    # await api.cancel_all_orders()  # it returns None
+
+    # # Place an order that goes through
+    # aapl_market_order = await api.submit_order(
+    #     symbol="AAPL",
+    #     qty=1,
+    #     side=OrderSide.BUY,
+    #     type=OrderType.MARKET
+    # )
+
+    # # Write expected position
+    # await asyncio.sleep(5) # wait 5 seconds to be sure the order went through
+    # position = await api.get_position(symbol="AAPL")
+    # # print(position.__dict__)
+    # with open("tests/data/get_position/expected_get_position.json", "w") as f:
+    #     json.dump(position.__dict__, f)
+
+    # # Write out api position
+    # position_api = api.api.get_position(symbol="AAPL")
+    # # print(position_api.__dict__)
+    # with open("tests/data/get_position/api_get_position.json", "w") as f:
+    #     json.dump(position_api.__dict__, f)
+
+    # sys.exit()
 
 
     #################################################################################

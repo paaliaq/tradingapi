@@ -1,11 +1,12 @@
 import json
 
-from alpaca_trade_api.entity import Account, Clock, Order, Calendar
+from alpaca_trade_api.entity import Account, Clock, Order, Calendar, Position
 from dateutil import parser
 from datetime import datetime
 from domainmodels.account import DomainAccount, Status
 from domainmodels.clock import DomainClock
 from domainmodels.order import DomainOrder, OrderSide, Type
+from domainmodels.position import DomainPosition
 from domainmodels.trading_day import TradingDay
 from typing import List
 
@@ -142,3 +143,20 @@ def import_expected_get_trading_days() -> List[TradingDay]:
             domain_trading_day_list.append(domain_trading_day)
 
         return domain_trading_day_list
+
+
+def import_api_get_position() -> Position:
+    """Import the simulated output from the alpaca api."""
+    with open("tests/data/get_position/api_get_position.json", "r") as d:
+        api_position = Position(None)
+        api_position.__dict__ = json.loads(d.read())
+        return api_position
+
+
+def import_expected_get_position() -> DomainPosition:
+    """Import the expected output from the alpaca api wrapper."""
+    with open("tests/data/get_position/expected_get_position.json", "r") as d:
+        domain_position = DomainPosition()
+        domain_position.__dict__ = json.loads(d.read())
+        return domain_position
+

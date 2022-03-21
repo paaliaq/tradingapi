@@ -43,8 +43,8 @@ class PositionMapper(Mapper[Position, DomainPosition]):
         domain_position = self.sa(domain_position, position, "unrealized_plpc")
         domain_position = self.sa(domain_position, position, "unrealized_intraday_pl")
         domain_position = self.sa(domain_position, position, "unrealized_intraday_plpc")
-        domain_position = self.set_attr(domain_position, position, "current_price")
-        domain_position = self.set_attr(domain_position, position, "lastday_price")
-        domain_position = self.set_attr(domain_position, position, "change_today")
+        domain_position = self.sa(domain_position, position, "current_price")
+        domain_position = self.sa(domain_position, position, "lastday_price")
+        domain_position = self.sa(domain_position, position, "change_today")
 
         return domain_position

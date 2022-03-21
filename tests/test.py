@@ -92,6 +92,13 @@ class AlpacaTests(aiounittest.AsyncTestCase):
         except Exception as ex:
             assert False, f"test_cancel_order_ok raised exception {ex}"
 
+    async def test_get_position_ok(self):
+        """Test the get position method."""
+        symbol = "AAPL"
+        self.alpaca_api.api.get_position.return_value = dh.import_api_get_position()
+        position = await self.alpaca_api.get_position(symbol)
+        expected_position = dh.import_expected_get_position()
+        compare(position, expected_position, prefix="Expected position object is different.")
 
     async def test_list_positions_ok(self):
         """Test the list positions method."""
@@ -99,15 +106,8 @@ class AlpacaTests(aiounittest.AsyncTestCase):
         # positions = await self.alpaca_api.list_positions()
         # expected_order = dh.import_expected_list_positions()
         # compare(order, expected_order, prefix="Expected order object is different.")
-
         pass
 
-    async def test_get_position_ok(self):
-        """Test the get position method."""
-        # self.alpaca_api.api.get_position.return_value = dh.import_api_get_position()
-        # position = await self.alpaca_api.get_position()
-
-        pass
 
     async def test_close_position_ok(self):
         """Test the close position method."""
