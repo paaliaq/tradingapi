@@ -1,20 +1,13 @@
 import asyncio
-from datetime import datetime
 import json
-import pickle
 import sys
 
 sys.path.insert(0, '../src')
 
 print(sys.path)
 
-from domainmodels.account import DomainAccount
-from domainmodels.clock import DomainClock
-from domainmodels.closed_position import ClosedPosition
-from domainmodels.order import DomainOrder, OrderSide
+from domainmodels.order import OrderSide
 from domainmodels.order import Type as OrderType
-from domainmodels.position import DomainPosition
-from domainmodels.trading_day import TradingDay
 from tradingapi.alpaca.alpaca_api import AlpacaApi
 
 
@@ -93,7 +86,6 @@ async def main() -> None:
     #     limit_price=1  # set small limit s.t. the order does not get filled
     # )
 
-
     # # Write out expected list order
     # order_list = await api.list_orders()
     # #print([order.__dict__ for order in order_list])
@@ -116,7 +108,7 @@ async def main() -> None:
     # from_dt = datetime(2022, 3, 1)
     # to_dt = datetime(2022, 3, 15)
     # format = '%Y-%m-%d %H:%M:%S'
-    
+
     # # Write out expected trading days
     # trading_days = await api.get_trading_days(from_dt, to_dt)
     # trading_days_converted = []
@@ -134,7 +126,6 @@ async def main() -> None:
     # # print([day.__dict__ for day in trading_days_api])
     # with open("tests/data/get_trading_days/api_get_trading_days.json", "w") as f:
     #     json.dump([day.__dict__ for day in trading_days_api], f)
-
 
     #################################################################################
     # Check that test_get_position_ok works
@@ -169,7 +160,6 @@ async def main() -> None:
 
     # sys.exit()
 
-
     #################################################################################
     # Check that test_list_positions_ok works
     #################################################################################
@@ -193,22 +183,19 @@ async def main() -> None:
         side=OrderSide.BUY,
         type=OrderType.MARKET
     )
-    await asyncio.sleep(5) # wait 5 seconds to be sure the order went through
+    await asyncio.sleep(5)  # wait 5 seconds to be sure the order went through
 
     # Write expected position list
-    position_list = await api.list_positions()
-    #print([position.__dict__ for position in position_list])
-    with open("tests/data/list_positions/expected_list_positions.json", "w") as f:
-        json.dump([position.__dict__ for position in position_list], f)
+    # position_list = await api.list_positions()
+    # print([position.__dict__ for position in position_list])
+    # with open("tests/data/list_positions/expected_list_positions.json", "w") as f:
+    #    json.dump([position.__dict__ for position in position_list], f)
 
     # Write out api position list
-    position_list_api = api.api.list_positions()
-    #print([position.__dict__ for position in position_list_api])
-    with open("tests/data/list_positions/api_list_positions.json", "w") as f:
-        json.dump([position.__dict__ for position in position_list_api], f)
-
-    sys.exit()
-
+    # position_list_api = api.api.list_positions()
+    # print([position.__dict__ for position in position_list_api])
+    # with open("tests/data/list_positions/api_list_positions.json", "w") as f:
+    #    json.dump([position.__dict__ for position in position_list_api], f)
 
     # #################################################################################
     # # Other
@@ -237,7 +224,6 @@ async def main() -> None:
     # # tsla_stop_limit_order = api.api.get_order(order_id=tsla_stop_limit_order.id)
     # # with open("tests/data/get_order/api_get_order.json", "w") as f:
     # #     json.dump(tsla_stop_limit_order.__dict__, f)
-
 
     # # Check that cancel_order works
     # await api.cancel_order(order_id=tsla_stop_limit_order.id)  # it returns None
@@ -292,15 +278,20 @@ async def main() -> None:
     # assert hasattr(closed_aapl_order, "side")
 
     # # Check that close_all_positions works
-    # closed_positions = await api.close_all_positions()
+
+    closed_positions_int = api.api.close_all_positions()
+    # with open("tests/data/close_all_positions/api_close_all_positions.json", "w") as f:
+    #   json.dump([position.__dict__ for position in closed_positions_int], f)
+
+    closed_positions = await api.close_all_positions()
+    with open("tests/data/close_all_positions/expected_close_all_positions.json", "w") as f:
+        json.dump([position.__dict__ for position in closed_positions], f)
 
     # with open("data/get_account/expected_close_all_positions.pkl") as file:
     #     pickle.dump(closed_positions, file)
 
     # assert len(closed_positions) > 0
     # assert all([isinstance(position, ClosedPosition) for position in closed_positions])
-
-
 
 
 if __name__ == "__main__":

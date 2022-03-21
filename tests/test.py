@@ -1,12 +1,13 @@
 import unittest
-from unittest.mock import Mock
 from datetime import datetime
+from unittest.mock import Mock
+
 import aiounittest
 from testfixtures import compare
 
 import testhelpers.data_helper as dh
-from tradingapi.alpaca.alpaca_api import AlpacaApi
 from domainmodels.order import OrderSide, Type as OrderType
+from tradingapi.alpaca.alpaca_api import AlpacaApi
 
 
 class AlpacaTests(aiounittest.AsyncTestCase):
@@ -107,7 +108,6 @@ class AlpacaTests(aiounittest.AsyncTestCase):
         expected_positions = dh.import_expected_list_positions()
         compare(positions, expected_positions, prefix="Expected positions object is different.")
 
-
     async def test_close_position_ok(self):
         """Test the close position method."""
         # self.alpaca_api.api.close_position.return_value = dh.import_api_close_position()
@@ -117,10 +117,10 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_close_all_positions_ok(self):
         """Test the close all positions method."""
-        # self.alpaca_api.api.close_all_positions.return_value = dh.import_api_close_all_positions()
-        # closed_positions = await self.alpaca_api.close_all_positions()
-
-        pass
+        self.alpaca_api.api.close_all_positions.return_value = dh.import_api_close_all_positions()
+        closed_positions = await self.alpaca_api.close_all_positions()
+        expected_close_positions = dh.import_expected_close_all_positions()
+        compare(closed_positions, expected_close_positions, prefix="Expected closed positions object is different.")
 
     async def test_get_trading_days_ok(self):
         """Test the get trading days method."""
@@ -130,6 +130,7 @@ class AlpacaTests(aiounittest.AsyncTestCase):
         trading_days = await self.alpaca_api.get_trading_days(from_dt, to_dt)
         expected_trading_days = dh.import_expected_get_trading_days()
         compare(trading_days, expected_trading_days, prefix="Expected trading days object is different.")
+
 
 if __name__ == '__main__':
     unittest.main()

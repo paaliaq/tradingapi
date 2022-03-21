@@ -5,6 +5,7 @@ from dateutil import parser
 from datetime import datetime
 from domainmodels.account import DomainAccount, Status
 from domainmodels.clock import DomainClock
+from domainmodels.closed_position import ClosedPosition
 from domainmodels.order import DomainOrder, OrderSide, Type
 from domainmodels.position import DomainPosition
 from domainmodels.trading_day import TradingDay
@@ -183,6 +184,32 @@ def import_expected_list_positions() -> List[DomainPosition]:
         domain_position_list = []
         for position in position_list:
             domain_position = DomainPosition()
+            domain_position.__dict__ = position
+            domain_position_list.append(domain_position)
+
+        return domain_position_list
+
+
+def import_api_close_all_positions() -> List[Position]:
+    """Import the simulated output from the alpaca api."""
+    with open("tests/data/close_all_positions/api_close_all_positions.json", "r") as d:
+        close_position_list = json.loads(d.read())
+        api_close_position_list = []
+        for position in close_position_list:
+            api_position = Position(None)
+            api_position.__dict__ = position
+            api_close_position_list.append(api_position)
+
+        return api_close_position_list
+
+
+def import_expected_close_all_positions() -> List[ClosedPosition]:
+    """Import the expected output from the alpaca api wrapper."""
+    with open("tests/data/close_all_positions/expected_close_all_positions.json", "r") as d:
+        close_position_list = json.loads(d.read())
+        domain_position_list = []
+        for position in close_position_list:
+            domain_position = ClosedPosition()
             domain_position.__dict__ = position
             domain_position_list.append(domain_position)
 
