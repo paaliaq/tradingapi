@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 
 from domainmodels.account import DomainAccount
 from domainmodels.clock import DomainClock
+from domainmodels.closed_position import ClosedPosition
 from domainmodels.order import (
     DomainOrder,
     OrderClass,
@@ -128,11 +129,11 @@ class BaseApi(ABC):
         pass
 
     @abstractmethod
-    async def close_position(self, symbol: str, **kwargs: Any) -> DomainPosition:
+    async def close_position(self, symbol: str, **kwargs: Any) -> DomainOrder:
         """Liquidates the position for the given symbol at market price."""
         pass
 
     @abstractmethod
-    async def close_all_positions(self, **kwargs: Any) -> List[DomainPosition]:
+    async def close_all_positions(self, **kwargs: Any) -> List[ClosedPosition]:
         """Liquidates all open positions at market price."""
         pass

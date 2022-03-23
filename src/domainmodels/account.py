@@ -16,6 +16,13 @@ class Status(str, Enum):
     REJECTED = "REJECTED"
 
 
+class CryptoStatus(str, Enum):
+    """The status of if crypto is enabled."""
+
+    ACTIVE = "ACTIVE"
+    INACTIVE = "INACTIVE"
+
+
 class DomainAccount:
     """An account."""
 
@@ -23,28 +30,29 @@ class DomainAccount:
     account_number: str
     account_blocked: bool
     accrued_fees: float
-    buying_power: str
-    cash: str
+    buying_power: float
+    cash: float
     created_at: datetime
     currency: str
     daytrade_count: int
-    daytrading_buying_power: str
-    equity: str
-    initial_margin: str
-    last_equity: str
-    last_maintenance_margin: str
-    long_market_value: str
-    maintenance_margin: str
-    multiplier: int
+    daytrading_buying_power: float
+    equity: float
+    initial_margin: float
+    last_equity: float
+    last_maintenance_margin: float
+    long_market_value: float
+    maintenance_margin: float
+    multiplier: float
     non_marginable_buying_power: float
     pattern_day_trader: bool
     pending_transfer_in: float
-    portfolio_value: str
-    regt_buying_power: str
-    short_market_value: int
+    portfolio_value: float
+    regt_buying_power: float
+    short_market_value: float
     shorting_enabled: bool
     sma: int
     status: Status
+    crypto_status: CryptoStatus
     trade_suspended_by_user: bool
     trading_blocked: bool
     transfers_blocked: bool

@@ -2,8 +2,8 @@
 
 from alpaca_trade_api.entity import Account
 from dateutil import parser
+from domainmodels.account import CryptoStatus, DomainAccount, Status
 
-from domainmodels.account import DomainAccount, Status
 from mappers.mapper import Mapper
 
 
@@ -27,7 +27,6 @@ class AccountMapper(Mapper[Account, DomainAccount]):
         except TypeError:
             domain_account.created_at = account.created_at.to_pydatetime()
 
-        domain_account.crypto_status = account.crypto_status
         domain_account.currency = account.currency
         domain_account.daytrade_count = int(account.daytrade_count)
         # noinspection DuplicatedCode
@@ -47,9 +46,10 @@ class AccountMapper(Mapper[Account, DomainAccount]):
         domain_account.portfolio_value = float(account.portfolio_value)
         domain_account.regt_buying_power = float(account.regt_buying_power)
         domain_account.short_market_value = float(account.short_market_value)
-        domain_account.shorting_enabled = float(account.shorting_enabled)
-        domain_account.sma = float(account.sma)
+        domain_account.shorting_enabled = bool(account.shorting_enabled)
+        domain_account.sma = int(account.sma)
         domain_account.status = Status[account.status]
+        domain_account.crypto_status = CryptoStatus[account.CryptoStatus]
         domain_account.trade_suspended_by_user = account.trade_suspended_by_user
         domain_account.trading_blocked = account.trading_blocked
         domain_account.transfers_blocked = account.transfers_blocked

@@ -51,23 +51,6 @@ class AlpacaApi(BaseApi):
 
         return domain_account
 
-    # def _handle_kwargs_submit_order(self, **kwargs: Any) -> Dict:
-    #     """Function to initialize missing kwargs for submit_order function."""
-    #     # Initialize default kwargs if necessary
-    #     if "time_in_force" not in kwargs:
-    #         kwargs["time_in_force"] = "day"
-    #     if "extended_hours" not in kwargs:
-    #         kwargs["extended_hours"] = None
-    #     if "take_profit" not in kwargs:
-    #         kwargs["take_profit"] = None
-    #     if "stop_loss" not in kwargs:
-    #         kwargs["stop_loss"] = None
-    #     if "trail_price" not in kwargs:
-    #         kwargs["trail_price"] = None
-    #     if "trail_percent" not in kwargs:
-    #         kwargs["trail_percent"] = None
-    #    return kwargs
-
     async def get_clock(self) -> DomainClock:
         """Returns the clock."""
         # Get clock
