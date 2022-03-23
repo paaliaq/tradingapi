@@ -110,10 +110,10 @@ class AlpacaTests(aiounittest.AsyncTestCase):
 
     async def test_close_position_ok(self):
         """Test the close position method."""
-        # self.alpaca_api.api.close_position.return_value = dh.import_api_close_position()
-        # closed_position = await self.alpaca_api.close_position()
-
-        pass
+        self.alpaca_api.api.close_position.return_value = dh.import_api_close_position()
+        closed_position = await self.alpaca_api.close_position("MSFT")
+        expected_closed_position = dh.import_expected_close_position()
+        compare(closed_position, expected_closed_position, prefix="Expected order object is different.")
 
     async def test_close_all_positions_ok(self):
         """Test the close all positions method."""

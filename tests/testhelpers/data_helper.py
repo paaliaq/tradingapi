@@ -1,15 +1,17 @@
 import json
+from datetime import datetime
+from typing import List
 
 from alpaca_trade_api.entity import Account, Clock, Order, Calendar, Position
 from dateutil import parser
-from datetime import datetime
+
 from domainmodels.account import DomainAccount, Status
 from domainmodels.clock import DomainClock
 from domainmodels.closed_position import ClosedPosition
 from domainmodels.order import DomainOrder, OrderSide, Type
 from domainmodels.position import DomainPosition
 from domainmodels.trading_day import TradingDay
-from typing import List
+
 
 # json.dumps(domain_account.__dict__, default=str)
 
@@ -88,7 +90,6 @@ def import_expected_get_order() -> DomainOrder:
 def import_api_list_orders() -> List[Order]:
     """Import the simulated output from the alpaca api."""
     with open("tests/data/list_orders/api_list_orders.json", "r") as d:
-
         order_list = json.loads(d.read())
         api_order_list = []
         for order in order_list:
@@ -102,7 +103,6 @@ def import_api_list_orders() -> List[Order]:
 def import_expected_list_orders() -> List[DomainOrder]:
     """Import the expected output from the alpaca api wrapper."""
     with open("tests/data/list_orders/expected_list_orders.json", "r") as d:
-
         order_list = json.loads(d.read())
         domain_order_list = []
         for order in order_list:
@@ -118,7 +118,6 @@ def import_expected_list_orders() -> List[DomainOrder]:
 def import_api_get_trading_days() -> List[Calendar]:
     """Import the simulated output from the alpaca api."""
     with open("tests/data/get_trading_days/api_get_trading_days.json", "r") as d:
-
         trading_days = json.loads(d.read())
         api_trading_day_list = []
         for day in trading_days:
@@ -132,7 +131,6 @@ def import_api_get_trading_days() -> List[Calendar]:
 def import_expected_get_trading_days() -> List[TradingDay]:
     """Import the expected output from the alpaca api wrapper."""
     with open("tests/data/get_trading_days/expected_get_trading_days.json", "r") as d:
-
         format = '%Y-%m-%d %H:%M:%S'
         trading_days = json.loads(d.read())
         domain_trading_day_list = []
@@ -165,7 +163,6 @@ def import_expected_get_position() -> DomainPosition:
 def import_api_list_positions() -> List[Position]:
     """Import the simulated output from the alpaca api."""
     with open("tests/data/list_positions/api_list_positions.json", "r") as d:
-
         position_list = json.loads(d.read())
         api_position_list = []
         for position in position_list:
@@ -179,7 +176,6 @@ def import_api_list_positions() -> List[Position]:
 def import_expected_list_positions() -> List[DomainPosition]:
     """Import the expected output from the alpaca api wrapper."""
     with open("tests/data/list_positions/expected_list_positions.json", "r") as d:
-
         position_list = json.loads(d.read())
         domain_position_list = []
         for position in position_list:
@@ -214,3 +210,19 @@ def import_expected_close_all_positions() -> List[ClosedPosition]:
             domain_position_list.append(domain_position)
 
         return domain_position_list
+
+
+def import_api_close_position() -> Order:
+    """Import the expected output from the alpaca api wrapper."""
+    with open("tests/data/close_position/api_closed_position.json", "r") as d:
+        api_order = Order(None)
+        api_order.__dict__ = json.loads(d.read())
+        return api_order
+
+
+def import_expected_close_position() -> DomainOrder:
+    """Import the expected output from the alpaca api wrapper."""
+    with open("tests/data/close_position/expected_closed_position.json", "r") as d:
+        domain_order = DomainOrder(None)
+        domain_order.__dict__ = json.loads(d.read())
+        return domain_order
